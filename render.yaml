@@ -8,7 +8,8 @@
 #
 # Deploy: Render Dashboard → New Blueprint → connect repo → branch → apply.
 #
-# Public URLs follow https://<name>.onrender.com — see envVarGroups.
+# Public URLs: https://bloodchain.life (demo hub) and https://<app>.bloodchain.life
+# DNS setup: docs/DNS-bloodchain.life.md
 #
 # Stack: bc-api + 9 static constellation apps + bc-demo-hub (11 services total).
 #
@@ -24,28 +25,28 @@ envVarGroups:
   - name: bc-vite-api
     envVars:
       - key: VITE_API_URL
-        value: https://bc-api.onrender.com/api/v1
+        value: https://api.bloodchain.life/api/v1
 
   - name: bc-demo-hub-links
     envVars:
       - key: VITE_HIGH_COMMAND_URL
-        value: https://bc-high-command.onrender.com
+        value: https://command.bloodchain.life
       - key: VITE_MARS_LAB_URL
-        value: https://bc-mars-lab.onrender.com
+        value: https://mars.bloodchain.life
       - key: VITE_VOYAGER_URL
-        value: https://bc-voyager.onrender.com
+        value: https://voyager.bloodchain.life
       - key: VITE_SCYTHER_URL
-        value: https://bc-scyther.onrender.com
+        value: https://scyther.bloodchain.life
       - key: VITE_AZURE_URL
-        value: https://bc-azure.onrender.com
+        value: https://azure.bloodchain.life
       - key: VITE_TRANSFUSE_URL
-        value: https://bc-transfuse.onrender.com
+        value: https://transfuse.bloodchain.life
       - key: VITE_HELIX_URL
-        value: https://bc-helix.onrender.com
+        value: https://helix.bloodchain.life
       - key: VITE_CHRONICLE_URL
-        value: https://bc-chronicle.onrender.com
+        value: https://chronicle.bloodchain.life
       - key: VITE_SENTINEL_URL
-        value: https://bc-sentinel.onrender.com
+        value: https://sentinel.bloodchain.life
 
 services:
   - type: web
@@ -57,6 +58,8 @@ services:
     buildCommand: yarn install && yarn prisma generate && yarn build
     startCommand: yarn prisma migrate deploy && yarn start
     healthCheckPath: /health
+    domains:
+      - api.bloodchain.life
     envVars:
       - key: NODE_VERSION
         value: "20.19.0"
@@ -77,6 +80,8 @@ services:
     rootDir: azure
     buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
     staticPublishPath: dist
+    domains:
+      - azure.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -96,6 +101,8 @@ services:
     rootDir: high-command
     buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
     staticPublishPath: dist
+    domains:
+      - command.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -115,6 +122,8 @@ services:
     rootDir: mars-lab
     buildCommand: yarn install && yarn build
     staticPublishPath: dist
+    domains:
+      - mars.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -136,6 +145,8 @@ services:
     rootDir: scyther
     buildCommand: yarn install && yarn build
     staticPublishPath: dist
+    domains:
+      - scyther.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -155,6 +166,8 @@ services:
     rootDir: voyager
     buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
     staticPublishPath: dist
+    domains:
+      - voyager.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -174,6 +187,8 @@ services:
     rootDir: transfuse
     buildCommand: yarn install && yarn build
     staticPublishPath: dist
+    domains:
+      - transfuse.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -193,6 +208,8 @@ services:
     rootDir: helix
     buildCommand: yarn install && yarn build
     staticPublishPath: dist
+    domains:
+      - helix.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -212,6 +229,8 @@ services:
     rootDir: chronicle
     buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
     staticPublishPath: dist
+    domains:
+      - chronicle.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -231,6 +250,8 @@ services:
     rootDir: sentinel
     buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
     staticPublishPath: dist
+    domains:
+      - sentinel.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -256,6 +277,8 @@ services:
     rootDir: demo-hub
     buildCommand: yarn install && yarn build
     staticPublishPath: dist
+    domains:
+      - bloodchain.life
     routes:
       - type: rewrite
         source: /*

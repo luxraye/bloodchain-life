@@ -4,7 +4,7 @@ function normalizeUrl(url) {
   if (url.startsWith('http')) return url
   const target = url.includes('.') || url.includes('localhost')
     ? url
-    : `${url}.onrender.com`
+    : `${url}.onrender.com` // legacy shorthand; production uses full https://*.bloodchain.life URLs
   const protocol = target.includes('localhost') || target.includes('127.0.0.1') ? 'http://' : 'https://'
   return protocol + target
 }

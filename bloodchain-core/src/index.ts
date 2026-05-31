@@ -19,8 +19,13 @@ const allowedOrigins = [
   'http://localhost:5175',
   'http://localhost:5176',
   'http://localhost:5177',
-  /\.onrender\.com$/, // Accepts any Render frontend dynamically
-  /\.vercel\.app$/   // If you end up using Vercel
+  'http://localhost:5178',
+  'http://localhost:5179',
+  'http://localhost:5180',
+  'http://localhost:5181',
+  /\.onrender\.com$/,
+  /\.bloodchain\.life$/,
+  /\.vercel\.app$/
 ];
 
 app.use(cors({
