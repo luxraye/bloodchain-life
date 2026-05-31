@@ -13,7 +13,7 @@ export interface GlassCardProps {
   children: React.ReactNode
   className?: string
   onClick?: React.MouseEventHandler<HTMLDivElement>
-  as?: keyof JSX.IntrinsicElements
+  as?: React.ElementType
 }
 
 export function GlassCard({
@@ -26,7 +26,6 @@ export function GlassCard({
   as: Tag = 'div',
 }: GlassCardProps) {
   return (
-    // @ts-expect-error — dynamic tag is safe here
     <Tag
       className={[
         'bc-glass-card',

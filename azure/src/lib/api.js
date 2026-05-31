@@ -14,11 +14,10 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(async (config) => {
+  if (!supabase) throw new Error('Supabase not configured')
   const { data: { session } } = await supabase.auth.getSession()
-  console.log('[API Interceptor] Session token:', session?.access_token ? session.access_token.substring(0, 20) + '...' : 'NONE')
-  if (session?.access_token) {
-    config.headers.Authorization = `Bearer ${session.access_token}`
-  }
+  if (!session?.access_token) throw new Error('Missing active session')
+  config.headers.Authorization = `Bearer ${session.access_token}`
   return config
 })
 

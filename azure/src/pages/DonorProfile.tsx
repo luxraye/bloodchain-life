@@ -35,6 +35,11 @@ export default function DonorProfile({ profile, session, onProfileUpdate }: any)
         return;
       }
 
+      if (!supabase) {
+        setKycError('Supabase is not configured for file uploads.');
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const filePath = `${session.id}/omang_id_${Date.now()}.${fileExt}`;
       

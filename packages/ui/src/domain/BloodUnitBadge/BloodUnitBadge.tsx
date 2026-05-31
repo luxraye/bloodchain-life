@@ -1,4 +1,3 @@
-import React from 'react'
 import { Badge } from '../../components/Badge/Badge'
 import type { BadgeVariant } from '../../components/Badge/Badge'
 import { UNIT_STATUS_COLORS } from '../../tokens'

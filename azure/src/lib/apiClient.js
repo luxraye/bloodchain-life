@@ -19,6 +19,7 @@ apiClient.interceptors.request.use(async (config) => {
     if (isBypass) {
         config.headers.Authorization = 'Bearer dev-bypass'
     } else {
+        if (!supabase) throw new Error('Supabase not configured')
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.access_token) {
             config.headers.Authorization = `Bearer ${session.access_token}`
@@ -35,7 +36,7 @@ apiClient.interceptors.response.use(
     (error) => {
         // If a 401 comes back and we're not in bypass mode, the session is gone —
         // Supabase will handle the redirect via onAuthStateChange in useAuth.
-        if (!isDemoSession() && error.response?.status === 401 && !(import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true')) {
+        if (!isDemoSession() && supabase && error.response?.status === 401 && !(import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true')) {
             supabase.auth.signOut()
         }
         return Promise.reject(error)

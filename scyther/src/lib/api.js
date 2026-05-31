@@ -23,6 +23,7 @@ const normalizeUrl = (url) => {
 const BASE = normalizeUrl(import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1')
 
 async function getAccessToken() {
+  if (!supabase) return null
   const { data } = await supabase.auth.getSession()
   return data.session?.access_token ?? null
 }

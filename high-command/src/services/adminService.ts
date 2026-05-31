@@ -2,7 +2,6 @@ import api from '../lib/api';
 import { isDemoSession } from '../lib/isDemoSession';
 import {
     DEMO_ASSET_STATUS,
-    DEMO_USERS,
     DEMO_LEDGER_ROWS,
     DEMO_MAP_NODES,
     DEMO_TRANSIT_ROUTES,

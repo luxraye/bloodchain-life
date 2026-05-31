@@ -28,7 +28,7 @@ export const mockLabAssets: LabAsset[] = [
     collectionTimestamp: ts(5.1),
     expirationDate:      exp(3),
     bloodType:           'A−',
-    componentType:       'Fresh Frozen Plasma',
+    componentType:       'Plasma',
     viralScreening: { hiv: 'NEGATIVE', hepB: 'NEGATIVE', hepC: 'NEGATIVE', syphilis: 'NEGATIVE' },
     status: 'QUARANTINE',
     chainOfCustody: [

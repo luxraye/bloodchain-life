@@ -22,6 +22,7 @@ apiClient.interceptors.request.use(async (config) => {
     if (isGuestDemo()) {
         throw new Error('Guest demo mode blocks all network requests')
     }
+    if (!supabase) throw new Error('Supabase not configured')
     const { data } = await supabase.auth.getSession()
     const token = data.session?.access_token
     if (!token) throw new Error('Missing active session')
@@ -32,7 +33,7 @@ apiClient.interceptors.request.use(async (config) => {
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 401) {
+        if (!isGuestDemo() && supabase && error.response?.status === 401) {
             await supabase.auth.signOut()
         }
         return Promise.reject(error)

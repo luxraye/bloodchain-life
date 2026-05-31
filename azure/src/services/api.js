@@ -20,7 +20,7 @@ export async function registerDonor({ email, password, name, bloodType, accepted
   })
   const json = await res.json()
   if (!res.ok) throw new Error(json.error || 'Registration failed')
-  // Auto sign-in after DB registration
+  if (!supabase) throw new Error('Supabase not configured')
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
   if (signInError) throw new Error(signInError.message)
   return json.data
@@ -28,6 +28,7 @@ export async function registerDonor({ email, password, name, bloodType, accepted
 
 // ── Document Upload (Level 1 → 2) ────────────────────
 export async function uploadVerificationDoc(file) {
+  if (!supabase) throw new Error('Supabase not configured')
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
   const ext = file.name.split('.').pop()
