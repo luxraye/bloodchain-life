@@ -1,0 +1,266 @@
+# =============================================================================
+# Bloodchain — Render Blueprint (v2 / fresh stack)
+# =============================================================================
+#
+# Use this after initializing a NEW Git repo and connecting it in Render.
+# Service names below are intentionally different from any prior Blueprint so
+# Render creates new resources instead of reusing broken state.
+#
+# Deploy: Render Dashboard → New Blueprint → connect repo → branch → apply.
+#
+# Public URLs follow https://<name>.onrender.com — see envVarGroups.
+#
+# Stack: bc-api + 9 static constellation apps + bc-demo-hub (11 services total).
+#
+# =============================================================================
+
+databases:
+  - name: bc-infra-db
+    plan: free
+    databaseName: bloodchain
+    user: bloodchain
+
+envVarGroups:
+  - name: bc-vite-api
+    envVars:
+      - key: VITE_API_URL
+        value: https://bc-api.onrender.com/api/v1
+
+  - name: bc-demo-hub-links
+    envVars:
+      - key: VITE_HIGH_COMMAND_URL
+        value: https://bc-high-command.onrender.com
+      - key: VITE_MARS_LAB_URL
+        value: https://bc-mars-lab.onrender.com
+      - key: VITE_VOYAGER_URL
+        value: https://bc-voyager.onrender.com
+      - key: VITE_SCYTHER_URL
+        value: https://bc-scyther.onrender.com
+      - key: VITE_AZURE_URL
+        value: https://bc-azure.onrender.com
+      - key: VITE_TRANSFUSE_URL
+        value: https://bc-transfuse.onrender.com
+      - key: VITE_HELIX_URL
+        value: https://bc-helix.onrender.com
+      - key: VITE_CHRONICLE_URL
+        value: https://bc-chronicle.onrender.com
+      - key: VITE_SENTINEL_URL
+        value: https://bc-sentinel.onrender.com
+
+services:
+  - type: web
+    name: bc-api
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: bloodchain-core
+    buildCommand: yarn install && yarn prisma generate && yarn build
+    startCommand: yarn prisma migrate deploy && yarn start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bc-infra-db
+          property: connectionString
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+  - type: web
+    name: bc-azure
+    runtime: static
+    rootDir: azure
+    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-high-command
+    runtime: static
+    rootDir: high-command
+    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-mars-lab
+    runtime: static
+    rootDir: mars-lab
+    buildCommand: yarn install && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: VITE_SUPERVISOR_PIN
+        sync: false
+
+  - type: web
+    name: bc-scyther
+    runtime: static
+    rootDir: scyther
+    buildCommand: yarn install && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-voyager
+    runtime: static
+    rootDir: voyager
+    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-transfuse
+    runtime: static
+    rootDir: transfuse
+    buildCommand: yarn install && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-helix
+    runtime: static
+    rootDir: helix
+    buildCommand: yarn install && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-chronicle
+    runtime: static
+    rootDir: chronicle
+    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-sentinel
+    runtime: static
+    rootDir: sentinel
+    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: VITE_INSTANCES_API_URL
+        sync: false
+      - key: VITE_INSTANCES_API_KEY
+        sync: false
+      - key: VITE_INSTANCES_ADMIN_URL
+        sync: false
+
+  - type: web
+    name: bc-demo-hub
+    runtime: static
+    rootDir: demo-hub
+    buildCommand: yarn install && yarn build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - fromGroup: bc-demo-hub-links

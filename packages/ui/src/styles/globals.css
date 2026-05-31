@@ -1,0 +1,201 @@
+/*
+ * Bloodchain UI — Design Token Layer
+ * Import once at the root of each app: import '@bloodchain/ui/styles'
+ *
+ * All components in @bloodchain/ui reference these custom properties.
+ * Apps can override any token at their own :root to theme a deployment.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ─── Burgundy — Primary ─────────────────────────────── */
+  --bc-burg-950: #1A0509;
+  --bc-burg-900: #2D0A12;
+  --bc-burg-800: #4A1020;
+  --bc-burg-700: #6B1423;
+  --bc-burg-600: #8B1A2E;
+  --bc-burg-500: #A81F38;   /* brand primary */
+  --bc-burg-400: #C4304E;
+  --bc-burg-300: #D96070;
+  --bc-burg-200: #EAA0AA;
+  --bc-burg-100: #F7DDE0;
+  --bc-burg-50:  #FDF2F4;
+
+  /* ─── Azure — Secondary ──────────────────────────────── */
+  --bc-azure-950: #060D18;
+  --bc-azure-900: #0D1B2A;
+  --bc-azure-800: #122840;
+  --bc-azure-700: #1B3E5E;
+  --bc-azure-600: #2A5F8F;
+  --bc-azure-500: #3A82B8;
+  --bc-azure-400: #5BA4D4;
+  --bc-azure-300: #8EC4E8;
+  --bc-azure-200: #C2E0F4;
+  --bc-azure-100: #EAF5FC;
+  --bc-azure-50:  #F5FBFF;
+
+  /* ─── Neon Accents ───────────────────────────────────── */
+  --bc-neon-green: #00FF88;
+  --bc-neon-red:   #FF2D55;
+  --bc-neon-blue:  #00C8FF;
+  --bc-neon-amber: #FFB800;
+
+  /* ─── Neutrals ───────────────────────────────────────── */
+  --bc-neutral-950: #04050A;
+  --bc-neutral-900: #07090F;
+  --bc-neutral-800: #0C0F1A;
+  --bc-neutral-700: #111422;
+  --bc-neutral-600: #1C2030;
+  --bc-neutral-500: #2E3548;
+  --bc-neutral-400: #4A5568;
+  --bc-neutral-300: #6B7A8D;
+  --bc-neutral-200: #8899A8;
+  --bc-neutral-100: #B8C5D0;
+  --bc-neutral-50:  #E8EEF3;
+
+  /* ─── Semantic Surface ───────────────────────────────── */
+  --bc-bg-base:    var(--bc-neutral-900);
+  --bc-bg-surface: var(--bc-neutral-800);
+  --bc-bg-raised:  var(--bc-neutral-700);
+  --bc-bg-overlay: var(--bc-neutral-600);
+
+  /* ─── Glass ──────────────────────────────────────────── */
+  --bc-glass-bg:            rgba(255, 255, 255, 0.04);
+  --bc-glass-bg-hover:      rgba(255, 255, 255, 0.07);
+  --bc-glass-bg-active:     rgba(168, 31, 56, 0.06);
+  --bc-glass-border:        rgba(255, 255, 255, 0.09);
+  --bc-glass-border-hover:  rgba(255, 255, 255, 0.15);
+  --bc-glass-border-active: rgba(168, 31, 56, 0.55);
+  --bc-glass-blur:          16px;
+
+  /* ─── Text ───────────────────────────────────────────── */
+  --bc-text-primary:   #F0F4F8;
+  --bc-text-secondary: #8899A8;
+  --bc-text-muted:     #4A5568;
+  --bc-text-disabled:  #2E3548;
+  --bc-text-inverse:   #07090F;
+
+  /* ─── Typography ─────────────────────────────────────── */
+  --bc-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --bc-font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --bc-text-xs:   0.6875rem;  /* 11px */
+  --bc-text-sm:   0.75rem;    /* 12px */
+  --bc-text-base: 0.8125rem;  /* 13px */
+  --bc-text-md:   0.9375rem;  /* 15px */
+  --bc-text-lg:   1.0625rem;  /* 17px */
+  --bc-text-xl:   1.25rem;    /* 20px */
+  --bc-text-2xl:  1.5rem;     /* 24px */
+  --bc-text-3xl:  2rem;       /* 32px */
+  --bc-text-4xl:  2.5rem;     /* 40px */
+
+  --bc-weight-normal:    400;
+  --bc-weight-medium:    500;
+  --bc-weight-semibold:  600;
+  --bc-weight-bold:      700;
+  --bc-weight-extrabold: 800;
+
+  --bc-leading-tight:   1.25;
+  --bc-leading-snug:    1.4;
+  --bc-leading-normal:  1.55;
+  --bc-leading-relaxed: 1.7;
+
+  --bc-tracking-tight:  -0.03em;
+  --bc-tracking-snug:   -0.02em;
+  --bc-tracking-normal: 0em;
+  --bc-tracking-wide:   0.04em;
+  --bc-tracking-wider:  0.08em;
+  --bc-tracking-widest: 0.14em;
+
+  /* ─── Spacing ────────────────────────────────────────── */
+  --bc-space-1:  0.25rem;   /* 4px  */
+  --bc-space-2:  0.5rem;    /* 8px  */
+  --bc-space-3:  0.75rem;   /* 12px */
+  --bc-space-4:  1rem;      /* 16px */
+  --bc-space-5:  1.25rem;   /* 20px */
+  --bc-space-6:  1.5rem;    /* 24px */
+  --bc-space-8:  2rem;      /* 32px */
+  --bc-space-10: 2.5rem;    /* 40px */
+  --bc-space-12: 3rem;      /* 48px */
+
+  /* ─── Radii ──────────────────────────────────────────── */
+  --bc-radius-sm:   6px;
+  --bc-radius-md:   8px;
+  --bc-radius-lg:   12px;
+  --bc-radius-xl:   16px;
+  --bc-radius-2xl:  20px;
+  --bc-radius-full: 9999px;
+
+  /* ─── Shadows / Glow ─────────────────────────────────── */
+  --bc-shadow-sm:      0 1px 3px rgba(0,0,0,0.3);
+  --bc-shadow-md:      0 4px 12px rgba(0,0,0,0.4);
+  --bc-shadow-lg:      0 8px 24px rgba(0,0,0,0.5);
+  --bc-shadow-xl:      0 16px 40px rgba(0,0,0,0.6);
+
+  --bc-glow-burg:  0 0 20px rgba(168, 31, 56, 0.4);
+  --bc-glow-azure: 0 0 20px rgba(0, 200, 255, 0.25);
+  --bc-glow-green: 0 0 16px rgba(0, 255, 136, 0.3);
+  --bc-glow-red:   0 0 16px rgba(255, 45, 85, 0.3);
+
+  /* ─── Transitions ────────────────────────────────────── */
+  --bc-transition-fast:   0.15s ease;
+  --bc-transition-base:   0.2s ease;
+  --bc-transition-slow:   0.3s ease;
+  --bc-transition-spring: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --bc-transition-fold:   0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ─── Z-index ────────────────────────────────────────── */
+  --bc-z-base:    0;
+  --bc-z-raised:  10;
+  --bc-z-sticky:  40;
+  --bc-z-overlay: 50;
+  --bc-z-modal:   60;
+  --bc-z-toast:   70;
+}
+
+/* ─── Base Reset (scoped to .bc-app) ──────────────────────────────── */
+.bc-app *,
+.bc-app *::before,
+.bc-app *::after {
+  box-sizing: border-box;
+}
+
+.bc-app {
+  font-family: var(--bc-font-sans);
+  font-size: var(--bc-text-base);
+  color: var(--bc-text-primary);
+  background: var(--bc-bg-base);
+  line-height: var(--bc-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────── */
+.bc-app ::-webkit-scrollbar       { width: 5px; height: 5px; }
+.bc-app ::-webkit-scrollbar-track { background: transparent; }
+.bc-app ::-webkit-scrollbar-thumb {
+  background: var(--bc-burg-800);
+  border-radius: var(--bc-radius-full);
+}
+.bc-app ::-webkit-scrollbar-thumb:hover { background: var(--bc-burg-700); }
+
+/* ─── Focus Ring ──────────────────────────────────────────────────── */
+.bc-app :focus-visible {
+  outline: 2px solid var(--bc-burg-500);
+  outline-offset: 2px;
+  border-radius: var(--bc-radius-sm);
+}
+
+/* ─── Native select options ───────────────────────────────────────── */
+.bc-app select option {
+  background-color: var(--bc-bg-raised);
+  color:            var(--bc-text-primary);
+}
+.bc-app select option:disabled { color: var(--bc-text-muted); }
+
+/* ─── Selection ───────────────────────────────────────────────────── */
+.bc-app ::selection {
+  background: rgba(168, 31, 56, 0.3);
+  color: var(--bc-text-primary);
+}

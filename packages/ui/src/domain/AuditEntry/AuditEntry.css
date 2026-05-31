@@ -1,0 +1,95 @@
+/* ── AuditEntry ─────────────────────────────────────────────────────── */
+.bc-audit-entry {
+  background:    var(--bc-glass-bg);
+  border:        1px solid var(--bc-glass-border);
+  border-radius: var(--bc-radius-lg);
+  padding:       var(--bc-space-4) var(--bc-space-5);
+  transition:    background var(--bc-transition-fast);
+}
+.bc-audit-entry:hover {
+  background: var(--bc-glass-bg-hover);
+}
+
+.bc-audit-entry__header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--bc-space-4);
+  margin-bottom:   var(--bc-space-2);
+  flex-wrap:       wrap;
+}
+
+.bc-audit-entry__event {
+  font-family:    var(--bc-font-mono);
+  font-size:      var(--bc-text-sm);
+  font-weight:    var(--bc-weight-bold);
+  color:          var(--bc-burg-300);
+  letter-spacing: var(--bc-tracking-wide);
+}
+
+.bc-audit-entry__meta {
+  display:     flex;
+  align-items: center;
+  gap:         var(--bc-space-3);
+  flex-shrink: 0;
+}
+
+.bc-audit-entry__chip {
+  font-size:      var(--bc-text-xs);
+  font-weight:    var(--bc-weight-bold);
+  letter-spacing: var(--bc-tracking-widest);
+  padding:        2px 8px;
+  border-radius:  var(--bc-radius-sm);
+}
+.bc-audit-entry__chip--signed {
+  background: rgba(0, 255, 136, 0.1);
+  color:      var(--bc-neon-green);
+  border:     1px solid rgba(0, 255, 136, 0.2);
+}
+
+.bc-audit-entry__time {
+  font-size: var(--bc-text-xs);
+  color:     var(--bc-text-muted);
+  letter-spacing: var(--bc-tracking-wide);
+}
+
+.bc-audit-entry__summary {
+  font-size:   var(--bc-text-base);
+  color:       var(--bc-text-secondary);
+  line-height: var(--bc-leading-normal);
+  margin-bottom: var(--bc-space-3);
+}
+
+.bc-audit-entry__footer {
+  display:     flex;
+  flex-wrap:   wrap;
+  align-items: center;
+  gap:         var(--bc-space-4);
+}
+
+.bc-audit-entry__detail {
+  font-size:   var(--bc-text-xs);
+  color:       var(--bc-text-muted);
+  display:     flex;
+  align-items: center;
+  gap:         var(--bc-space-2);
+}
+
+.bc-audit-entry__role {
+  font-size:      var(--bc-text-xs);
+  font-weight:    var(--bc-weight-bold);
+  letter-spacing: var(--bc-tracking-wider);
+  text-transform: uppercase;
+  color:          var(--bc-azure-400);
+  padding:        1px 6px;
+  border:         1px solid rgba(58,130,184,0.25);
+  border-radius:  var(--bc-radius-sm);
+  background:     rgba(58,130,184,0.08);
+}
+
+.bc-audit-entry__mono {
+  font-family:  var(--bc-font-mono);
+  font-size:    var(--bc-text-xs);
+  color:        var(--bc-text-muted);
+  letter-spacing: 0.03em;
+}

@@ -1,0 +1,33 @@
+{
+  "name": "bloodchain",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "packages/*",
+    "azure",
+    "demo-hub",
+    "high-command",
+    "mars-lab",
+    "scyther",
+    "transfuse",
+    "helix",
+    "chronicle",
+    "sentinel",
+    "voyager"
+  ],
+  "scripts": {
+    "dev:azure":        "yarn workspace azure dev",
+    "dev:demo-hub":     "yarn workspace demo-hub dev",
+    "dev:high-command": "yarn workspace high-command dev",
+    "dev:mars-lab":     "yarn workspace mars-lab dev",
+    "dev:scyther":      "yarn workspace scyther dev",
+    "dev:transfuse":    "yarn workspace transfuse dev",
+    "dev:helix":        "yarn workspace helix dev",
+    "dev:chronicle":    "yarn workspace chronicle dev",
+    "dev:sentinel":     "yarn workspace sentinel dev",
+    "dev:voyager":      "yarn workspace voyager dev",
+    "build:ui":         "yarn workspace @bloodchain/ui build",
+    "lint":             "yarn workspaces run lint"
+  }
+}

@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Sentinel: burgundy/azure system + purple regulatory accent */
+:root {
+  --burg-500: #A81F38;
+  --burg-400: #C4304E;
+  --burg-300: #D96070;
+  --azure-500: #3A82B8;
+  --azure-300: #8EC4E8;
+  --sentinel-500: #7c3aed;
+  --sentinel-300: #a78bfa;
+  --neon-green: #00FF88;
+  --neon-red: #FF2D55;
+  --bg-base: #07090F;
+  --bg-surface: #0C0F1A;
+  --bg-raised: #111422;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --text-primary: #F0F4F8;
+  --text-secondary: #8899A8;
+  --text-muted: #4A5568;
+}
+
+html, body, #root { height: 100%; }
+.bc-app { min-height: 100%; }
+
+.font-mono-ui { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+@layer components {
+  .btn-primary {
+    @apply font-semibold px-5 py-3 rounded-xl transition min-h-[44px] disabled:opacity-50;
+    background: var(--burg-500);
+    color: #fff;
+    box-shadow: 0 0 18px rgba(168, 31, 56, 0.35);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--burg-400); }
+  .btn-sentinel {
+    @apply font-semibold px-5 py-3 rounded-xl transition min-h-[44px] disabled:opacity-50;
+    background: var(--sentinel-500);
+    color: #fff;
+    box-shadow: 0 0 18px rgba(124, 58, 237, 0.35);
+  }
+  .btn-sentinel:hover:not(:disabled) { filter: brightness(1.1); }
+  .btn-ghost {
+    @apply font-medium px-4 py-2.5 rounded-lg transition min-h-[44px];
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .btn-ghost:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+  .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    @apply rounded-xl;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl text-sm outline-none transition min-h-[44px];
+    background: var(--bg-raised);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: var(--text-primary);
+  }
+  .input-field:focus {
+    border-color: rgba(124, 58, 237, 0.65);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  }
+  .field-label {
+    @apply block text-[10px] font-semibold uppercase tracking-wider mb-1.5;
+    color: var(--text-secondary);
+  }
+  .badge { @apply inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide; }
+  .badge-regulatory { background: rgba(124, 58, 237, 0.15); color: var(--sentinel-300); border: 1px solid rgba(124, 58, 237, 0.3); }
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-in { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+.animate-fade-in { animation: fade-in 0.3s ease; }
+.animate-slide-in { animation: slide-in 0.25s ease; }

@@ -1,0 +1,143 @@
+/* ── Button ─────────────────────────────────────────────────────────── */
+.bc-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--bc-space-2);
+  border:          1px solid transparent;
+  border-radius:   var(--bc-radius-md);
+  font-family:     var(--bc-font-sans);
+  font-weight:     var(--bc-weight-semibold);
+  letter-spacing:  var(--bc-tracking-wide);
+  cursor:          pointer;
+  transition:
+    background    var(--bc-transition-base),
+    border-color  var(--bc-transition-base),
+    box-shadow    var(--bc-transition-base),
+    transform     var(--bc-transition-base),
+    opacity       var(--bc-transition-base);
+  white-space:     nowrap;
+  text-decoration: none;
+  position:        relative;
+  outline:         none;
+}
+
+.bc-btn:focus-visible {
+  outline:        2px solid var(--bc-burg-500);
+  outline-offset: 2px;
+}
+
+.bc-btn:active:not(:disabled) { transform: translateY(1px); }
+
+.bc-btn:disabled,
+.bc-btn--loading {
+  opacity: 0.45;
+  cursor:  not-allowed;
+  pointer-events: none;
+}
+
+/* ── Sizes ──────────────────────────────────────────────────────────── */
+.bc-btn--sm  { padding: 6px 14px;  font-size: var(--bc-text-xs); }
+.bc-btn--md  { padding: 9px 20px;  font-size: var(--bc-text-base); }
+.bc-btn--lg  { padding: 12px 28px; font-size: var(--bc-text-md); }
+
+.bc-btn--full { width: 100%; }
+
+/* ── Variants ───────────────────────────────────────────────────────── */
+
+/* Primary — burgundy */
+.bc-btn--primary {
+  background:   var(--bc-burg-500);
+  border-color: var(--bc-burg-500);
+  color:        #fff;
+  box-shadow:   var(--bc-glow-burg);
+}
+.bc-btn--primary:hover:not(:disabled) {
+  background:  var(--bc-burg-400);
+  border-color: var(--bc-burg-400);
+  box-shadow:  0 0 28px rgba(168, 31, 56, 0.55);
+  transform:   translateY(-1px);
+}
+
+/* Azure */
+.bc-btn--azure {
+  background:   transparent;
+  border-color: rgba(58, 130, 184, 0.45);
+  color:        var(--bc-azure-300);
+}
+.bc-btn--azure:hover:not(:disabled) {
+  background:   rgba(58, 130, 184, 0.1);
+  border-color: var(--bc-azure-400);
+  box-shadow:   0 0 16px rgba(0, 200, 255, 0.18);
+  transform:    translateY(-1px);
+}
+
+/* Ghost */
+.bc-btn--ghost {
+  background:   transparent;
+  border-color: var(--bc-glass-border);
+  color:        var(--bc-text-secondary);
+}
+.bc-btn--ghost:hover:not(:disabled) {
+  background:   var(--bc-glass-bg-hover);
+  border-color: var(--bc-glass-border-hover);
+  color:        var(--bc-text-primary);
+}
+
+/* Success */
+.bc-btn--success {
+  background:   transparent;
+  border-color: rgba(0, 255, 136, 0.35);
+  color:        var(--bc-neon-green);
+}
+.bc-btn--success:hover:not(:disabled) {
+  background:  rgba(0, 255, 136, 0.08);
+  border-color: var(--bc-neon-green);
+  box-shadow:  var(--bc-glow-green);
+  transform:   translateY(-1px);
+}
+
+/* Danger */
+.bc-btn--danger {
+  background:   transparent;
+  border-color: rgba(255, 45, 85, 0.35);
+  color:        var(--bc-neon-red);
+}
+.bc-btn--danger:hover:not(:disabled) {
+  background:  rgba(255, 45, 85, 0.08);
+  border-color: var(--bc-neon-red);
+  box-shadow:  var(--bc-glow-red);
+  transform:   translateY(-1px);
+}
+
+/* Glass */
+.bc-btn--glass {
+  background:   var(--bc-glass-bg);
+  border-color: var(--bc-glass-border);
+  color:        var(--bc-text-secondary);
+  backdrop-filter: blur(var(--bc-glass-blur));
+}
+.bc-btn--glass:hover:not(:disabled) {
+  background:   var(--bc-glass-bg-hover);
+  border-color: var(--bc-glass-border-hover);
+  color:        var(--bc-text-primary);
+}
+
+/* ── Spinner ────────────────────────────────────────────────────────── */
+.bc-btn__spinner {
+  display:       block;
+  width:         14px;
+  height:        14px;
+  border:        2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--bc-radius-full);
+  animation:     bc-spin 0.7s linear infinite;
+  flex-shrink:   0;
+}
+
+@keyframes bc-spin {
+  to { transform: rotate(360deg); }
+}
+
+.bc-btn__icon { display: flex; align-items: center; flex-shrink: 0; }
+.bc-btn__label { line-height: 1; }

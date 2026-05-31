@@ -1,0 +1,87 @@
+/* ── Accordion ──────────────────────────────────────────────────────── */
+.bc-accordion {
+  display:        flex;
+  flex-direction: column;
+  gap:            6px;
+}
+
+/* ── Item ───────────────────────────────────────────────────────────── */
+.bc-accordion__item {
+  border:        1px solid var(--bc-glass-border);
+  border-radius: var(--bc-radius-lg);
+  overflow:      hidden;
+  transition:    border-color var(--bc-transition-base);
+}
+.bc-accordion__item--open {
+  border-color: var(--bc-glass-border-hover);
+}
+
+/* ── Trigger ────────────────────────────────────────────────────────── */
+.bc-accordion__trigger {
+  width:           100%;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--bc-space-4);
+  padding:         var(--bc-space-4) var(--bc-space-5);
+  background:      var(--bc-glass-bg);
+  border:          none;
+  cursor:          pointer;
+  font-family:     var(--bc-font-sans);
+  font-size:       var(--bc-text-base);
+  font-weight:     var(--bc-weight-semibold);
+  color:           var(--bc-text-primary);
+  text-align:      left;
+  transition:      background var(--bc-transition-base);
+  outline:         none;
+}
+.bc-accordion__trigger:hover {
+  background: var(--bc-glass-bg-hover);
+}
+.bc-accordion__trigger:focus-visible {
+  outline:        2px solid var(--bc-burg-500);
+  outline-offset: -2px;
+}
+
+/* ── Title / Aside ──────────────────────────────────────────────────── */
+.bc-accordion__title { flex: 1; }
+.bc-accordion__aside {
+  display:     flex;
+  align-items: center;
+  gap:         var(--bc-space-3);
+  flex-shrink: 0;
+}
+
+/* ── Chevron ────────────────────────────────────────────────────────── */
+.bc-accordion__chevron {
+  color:      var(--bc-text-muted);
+  font-size:  14px;
+  transition: transform var(--bc-transition-fold);
+  display:    inline-flex;
+}
+.bc-accordion__item--open .bc-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Body — CSS grid height animation ──────────────────────────────── */
+.bc-accordion__body {
+  display:    grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--bc-transition-fold);
+  background: rgba(255, 255, 255, 0.015);
+}
+.bc-accordion__body--open {
+  grid-template-rows: 1fr;
+}
+
+.bc-accordion__content {
+  overflow: hidden;
+  padding:  0 var(--bc-space-5);
+  font-size:   var(--bc-text-base);
+  color:       var(--bc-text-secondary);
+  line-height: var(--bc-leading-relaxed);
+}
+.bc-accordion__body--open .bc-accordion__content {
+  padding-top:    var(--bc-space-4);
+  padding-bottom: var(--bc-space-5);
+}

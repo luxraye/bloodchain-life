@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Bloodchain Design Tokens ────────────────────────────────────────── */
+:root {
+  --bc-burg-500:  #A81F38;
+  --bc-burg-400:  #C4304E;
+  --bc-burg-300:  #D96070;
+  --bc-azure-400: #5BA4D4;
+  --bc-azure-300: #8EC4E8;
+  --bc-neon-green: #00FF88;
+  --bc-neon-red:   #FF2D55;
+  --bc-neon-blue:  #00C8FF;
+  --bc-neon-amber: #FFB800;
+  --bc-glass-bg:   rgba(255,255,255,0.04);
+  --bc-glass-border: rgba(255,255,255,0.09);
+  --bc-text-secondary: #8899A8;
+  --bc-text-muted: #4A5568;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background:  #07090F;
+  color:       #F0F4F8;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #4A1020; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #6B1423; }
+
+/* ── Selection ───────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(168,31,56,0.35);
+  color: #F0F4F8;
+}
+
+/* ── Glass utility ───────────────────────────────────────────────────── */
+.glass {
+  background:      var(--bc-glass-bg);
+  border:          1px solid var(--bc-glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.glass-hover:hover {
+  background:   rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+}
+
+/* ── Glow animations ─────────────────────────────────────────────────── */
+@keyframes glow-pulse  { 0%,100%{ opacity:1 } 50%{ opacity:0.35 } }
+@keyframes fade-up     { from{ opacity:0; transform:translateY(18px) } to{ opacity:1; transform:none } }
+@keyframes scan-line   { 0%{ transform:translateY(-100%) } 100%{ transform:translateY(100vh) } }
+@keyframes float       { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } }
+
+.animate-glow     { animation: glow-pulse 2.5s ease-in-out infinite; }
+.animate-fade-up  { animation: fade-up 0.55s ease forwards; }
+.animate-float    { animation: float 4s ease-in-out infinite; }
+
+/* ── Device Frames (preserved from original) ────────────────────────── */
+.iphone-frame {
+  position: relative;
+  display: inline-block;
+  background: #141416;
+  border-radius: 54px;
+  padding: 14px;
+  box-shadow:
+    inset 0 0 0 2px #2e2e30,
+    0 0 0 1px #1a1a1a,
+    0 40px 80px rgba(0,0,0,0.85),
+    0 0 60px rgba(168,31,56,0.08);
+}
+.iphone-frame::before {
+  content: '';
+  position: absolute;
+  top: 14px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 36px;
+  background: #141416;
+  border-radius: 0 0 22px 22px;
+  z-index: 10;
+  box-shadow: inset 0 -3px 0 0 #222;
+}
+.iphone-frame::after {
+  content: '';
+  position: absolute;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  width: 130px; height: 5px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+.iphone-screen { border-radius: 44px; overflow: hidden; background: #000; }
+
+.ipad-frame {
+  position: relative;
+  display: inline-block;
+  background: #141416;
+  border-radius: 22px;
+  padding: 20px 24px;
+  box-shadow:
+    inset 0 0 0 2px #2e2e30,
+    0 0 0 1px #1a1a1a,
+    0 60px 120px rgba(0,0,0,0.9);
+}
+.ipad-frame::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 20px;
+  transform: translateX(-50%);
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+}
+.ipad-screen { border-radius: 6px; overflow: hidden; background: #000; }
+
+/* ── Section divider line ────────────────────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,31,56,0.3) 30%, rgba(168,31,56,0.3) 70%, transparent);
+}
+
+/* ── Constellation carousel wheel ─────────────────────────────────────── */
+.constellation-stage {
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  touch-action: pan-y;
+}
+
+.constellation-track {
+  transform-style: preserve-3d;
+}
+
+.constellation-card-slot {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.constellation-card-expanded {
+  z-index: 20;
+}
+
+.constellation-stage-dimmed .constellation-track {
+  filter: brightness(0.85);
+}
+
+.constellation-stage-backdrop {
+  background: rgba(7, 9, 15, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  cursor: default;
+}
+
+.constellation-detail-panel {
+  position: relative;
+  z-index: 30;
+}
+
+.constellation-mobile-strip {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.constellation-mobile-strip::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes wheel-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.animate-wheel-glow {
+  animation: wheel-glow 2.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-card-slot {
+    transition: opacity 0.2s ease;
+  }
+  .animate-wheel-glow {
+    animation: none;
+  }
+}

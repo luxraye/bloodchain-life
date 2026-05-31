@@ -1,0 +1,451 @@
+// ─────────────────────────────────────────────────────
+// Bloodchain Core — Prisma Schema
+// Phase 2: Facility, Dispatch, Casbin-Ready Roles
+// ─────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────
+
+enum Role {
+  PUBLIC
+  MEDICAL
+  LAB
+  TRANSIT
+  ADMIN
+  // Casbin-ready extended roles
+  LOGISTICS_COMMAND
+  SUPER_ADMIN
+  MOH_AUDITOR
+  // Helix research module
+  RESEARCH_PI
+  RESEARCH_COORDINATOR
+  RESEARCH
+  ETHICS_READ
+  CHRONIC_CARE_COORDINATOR
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum AssetStatus {
+  COLLECTED
+  TESTING
+  QUARANTINE
+  RELEASED
+  IN_TRANSIT
+  USED
+  DISCARDED
+  REACTIVE_DISCARD
+  PROCESSED_SPLIT
+}
+
+enum FacilityType {
+  HOSPITAL
+  BLOOD_BANK
+  MOBILE_DRIVE
+  LABORATORY
+  DISTRIBUTION_CENTER
+}
+
+enum FacilityStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum DispatchStatus {
+  PENDING
+  IN_TRANSIT
+  DELIVERED
+  COMPROMISED_COLD_CHAIN
+  RETURNED
+  CANCELLED
+}
+
+enum ComponentType {
+  WHOLE_BLOOD
+  RBC
+  FFP
+  PLATELETS
+}
+
+enum TTIStatus {
+  PENDING
+  NEGATIVE
+  REACTIVE
+}
+
+// ─── Models ──────────────────────────────────────────
+
+model User {
+  id                 String     @id @default(uuid())
+  email              String     @unique
+  name               String
+  role               Role       @default(PUBLIC)
+  facilityId         String?
+  bloodType          String? // Self-declared or lab-confirmed
+  status             UserStatus @default(ACTIVE)
+  supabaseId         String?    @unique // Supabase Auth UUID
+  trustLevel         Int        @default(1) // 1=Bronze, 2=Silver(pending), 3=Gold(verified)
+  verificationDocUrl String? // Supabase Storage URL for uploaded Omang/Medical PDF
+  age                Int?
+  gender             String?
+  region             String?
+  medicalConditions  String? // e.g. "None", "Hypertension"
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  // Relations
+  donations     BloodAsset[]   @relation("DonorAssets")
+  custodyEvents CustodyEvent[]
+  actionLogs    ActionLog[]
+  dispatches    Dispatch[]     @relation("CourierDispatches")
+  TTIScreening  TTIScreening[]
+
+  @@map("users")
+}
+
+model Facility {
+  id             String         @id @default(uuid())
+  name           String
+  type           FacilityType
+  status         FacilityStatus @default(ACTIVE)
+  address        String?
+  region         String?
+  latitude       Float
+  longitude      Float
+  inventoryLevel Int            @default(0) // Current blood unit count
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  originDispatches      Dispatch[] @relation("OriginFacility")
+  destinationDispatches Dispatch[] @relation("DestinationFacility")
+
+  @@map("facilities")
+}
+
+model BloodAsset {
+  id              String        @id @default(uuid())
+  donorId         String
+  bloodType       String // e.g. "O+", "A-"
+  status          AssetStatus   @default(COLLECTED)
+  componentType   ComponentType @default(WHOLE_BLOOD)
+  currentLocation String // e.g. "NBTS Gaborone", "SKMTH"
+  latitude        Float? // Geospatial: collection/current lat
+  longitude       Float? // Geospatial: collection/current lng
+  notes           String?
+  parentUnitId    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  donor         User           @relation("DonorAssets", fields: [donorId], references: [id], onDelete: Cascade)
+  parentUnit    BloodAsset?    @relation("SplitComponents", fields: [parentUnitId], references: [id])
+  childUnits    BloodAsset[]   @relation("SplitComponents")
+  ttiScreening  TTIScreening?
+  custodyEvents CustodyEvent[]
+  dispatches    Dispatch[]
+
+  @@map("blood_assets")
+}
+
+model TTIScreening {
+  id           String    @id @default(uuid())
+  assetId      String    @unique
+  hiv_1_2      TTIStatus @default(PENDING)
+  hbsag        TTIStatus @default(PENDING)
+  hcv          TTIStatus @default(PENDING)
+  syphilis     TTIStatus @default(PENDING)
+  technicianId String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  asset      BloodAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  technician User       @relation(fields: [technicianId], references: [id])
+
+  @@map("tti_screenings")
+}
+
+model CustodyEvent {
+  id        String      @id @default(uuid())
+  assetId   String
+  actorId   String
+  actorName String
+  actorRole String
+  status    AssetStatus
+  location  String
+  latitude  Float? // Geospatial: event lat
+  longitude Float? // Geospatial: event lng
+  notes     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  asset BloodAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  actor User       @relation(fields: [actorId], references: [id])
+
+  @@map("custody_events")
+}
+
+model ActionLog {
+  id              String   @id @default(uuid())
+  assetId         String? // Nullable — some actions are not asset-specific
+  actionPerformed String // e.g. "Released", "Screened", "Collected", "Delivered"
+  userId          String
+  userName        String
+  userRole        String
+  facility        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("action_logs")
+}
+
+model Dispatch {
+  id               String         @id @default(uuid())
+  courierId        String
+  assetId          String
+  originFacilityId String
+  destFacilityId   String
+  status           DispatchStatus @default(PENDING)
+  departedAt       DateTime?
+  arrivedAt        DateTime?
+  temperatureLog   String? // JSON string for cold-chain data
+  notes            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  // Relations
+  courier     User       @relation("CourierDispatches", fields: [courierId], references: [id])
+  asset       BloodAsset @relation(fields: [assetId], references: [id])
+  origin      Facility   @relation("OriginFacility", fields: [originFacilityId], references: [id])
+  destination Facility   @relation("DestinationFacility", fields: [destFacilityId], references: [id])
+
+  @@map("dispatches")
+}
+
+// ─── Helix: Research & clinical trials (separate from BloodAsset) ───
+
+enum StudyStatus {
+  DRAFT
+  IRB_APPROVED
+  ACTIVE
+  CLOSED
+}
+
+enum StudyConsentStatus {
+  PENDING
+  SIGNED
+  WITHDRAWN
+}
+
+enum ResearchSampleStatus {
+  REGISTERED
+  COLLECTED
+  IN_TRANSIT
+  RECEIVED_BIOBANK
+  ALIQUOTED
+  IN_ANALYSIS
+  ARCHIVED
+  DESTROYED
+}
+
+model Study {
+  id                   String      @id @default(uuid())
+  code                 String      @unique
+  title                String
+  sponsor              String?
+  principalInvestigator String?
+  status               StudyStatus @default(DRAFT)
+  protocolVersion      String?
+  ethicsRef            String?
+  ethicsExpiry         DateTime?
+  sites                String[]    @default([])
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  participants StudyParticipant[]
+  samples      ResearchSample[]
+  actionLogs   StudyActionLog[]
+
+  @@map("studies")
+}
+
+model StudyParticipant {
+  id                 String             @id @default(uuid())
+  studyId            String
+  studyParticipantId String
+  arm                String?
+  consent            StudyConsentStatus @default(PENDING)
+  consentDate        DateTime?
+  site               String?
+  enrolledAt         DateTime           @default(now())
+
+  study   Study            @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  samples ResearchSample[]
+
+  @@unique([studyId, studyParticipantId])
+  @@map("study_participants")
+}
+
+model ResearchSample {
+  id                 String               @id @default(uuid())
+  studyId            String
+  participantId      String?
+  externalSampleId   String
+  specimenType       String?
+  visit              String?
+  status             ResearchSampleStatus @default(REGISTERED)
+  parentSampleId     String?
+  bloodAssetId       String?
+  site               String?
+  receiptAcceptable  Boolean?
+  receiptTempRange   String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  study       Study                 @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  participant StudyParticipant?     @relation(fields: [participantId], references: [id])
+  parent      ResearchSample?         @relation("SampleAliquots", fields: [parentSampleId], references: [id])
+  children    ResearchSample[]        @relation("SampleAliquots")
+  custody     SampleCustodyEvent[]
+
+  @@unique([studyId, externalSampleId])
+  @@map("research_samples")
+}
+
+model SampleCustodyEvent {
+  id        String               @id @default(uuid())
+  sampleId  String
+  status    ResearchSampleStatus
+  actorName String
+  actorRole String
+  location  String
+  notes     String?
+  createdAt DateTime             @default(now())
+
+  sample ResearchSample @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+
+  @@map("sample_custody_events")
+}
+
+model StudyActionLog {
+  id              String   @id @default(uuid())
+  studyId         String
+  actionPerformed String
+  userId          String?
+  userName        String
+  userRole        String
+  facility        String?
+  fieldChanged    String?
+  oldValue        String?
+  newValue        String?
+  reason          String?
+  createdAt       DateTime @default(now())
+
+  study Study @relation(fields: [studyId], references: [id], onDelete: Cascade)
+
+  @@map("study_action_logs")
+}
+
+// ─── Chronicle: Chronic care registry ───
+
+enum ChronicCondition {
+  HAEMOPHILIA
+  SICKLE_CELL
+  THALASSEMIA
+}
+
+enum CareGapStatus {
+  OPEN
+  RESOLVED
+}
+
+enum RegistryExceptionStatus {
+  OPEN
+  IN_PROGRESS
+  CONTACTED
+  RESOLVED
+  CLOSED
+}
+
+model ChronicPatient {
+  id            String           @id @default(uuid())
+  registryId    String           @unique
+  displayName   String
+  condition     ChronicCondition
+  bloodType     String?
+  severity      String?
+  site          String?
+  enrolledAt    DateTime         @default(now())
+  nextReview    DateTime?
+  notes         String?
+  sdohFlags     String[]         @default([])
+  carePlanJson  Json?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  careGaps      CareGap[]
+  transfusions  ChronicTransfusionEvent[]
+  exceptions    RegistryException[]
+
+  @@map("chronic_patients")
+}
+
+model CareGap {
+  id        String         @id @default(uuid())
+  patientId String
+  gapType   String
+  severity  String
+  status    CareGapStatus  @default(OPEN)
+  summary   String
+  createdAt DateTime       @default(now())
+
+  patient ChronicPatient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("care_gaps")
+}
+
+model ChronicTransfusionEvent {
+  id        String   @id @default(uuid())
+  patientId String
+  eventDate DateTime
+  product   String
+  units     String?
+  site      String?
+  bloodAssetId String?
+
+  patient ChronicPatient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("chronic_transfusion_events")
+}
+
+model RegistryException {
+  id         String                  @id @default(uuid())
+  patientId  String
+  exType     String
+  severity   String
+  status     RegistryExceptionStatus @default(OPEN)
+  summary    String
+  assignee   String?
+  createdAt  DateTime                @default(now())
+
+  patient ChronicPatient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("registry_exceptions")
+}

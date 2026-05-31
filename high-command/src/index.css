@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --burg-500: #A81F38;
+  --burg-300: #D96070;
+  --bg-base: #07090F;
+}
+
+.bc-app {
+  min-height: 100%;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    color-scheme: dark;
+  }
+
+  body {
+    background: #000000;
+    color: #e5e5e5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+  }
+
+  .glass-card-gold {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(234, 179, 8, 0.15);
+    border-radius: 12px;
+  }
+
+  .glass-card-red {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 12px;
+  }
+
+  .command-button {
+    @apply px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200;
+    @apply bg-command-gold text-black hover:bg-yellow-400 active:scale-95;
+    @apply shadow-lg shadow-yellow-500/10;
+  }
+
+  .command-button-danger {
+    @apply px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200;
+    @apply bg-command-red text-white hover:bg-red-500 active:scale-95;
+    @apply shadow-lg shadow-red-600/10;
+  }
+
+  .command-button-ghost {
+    @apply px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200;
+    @apply bg-transparent text-neutral-400 hover:text-white hover:bg-surface-300;
+  }
+
+  .command-input {
+    @apply w-full px-4 py-2.5 rounded-lg text-sm transition-all duration-200;
+    @apply bg-surface-100 border border-surface-400 text-white;
+    @apply focus:outline-none focus:border-command-gold focus:ring-1 focus:ring-command-gold/30;
+    @apply placeholder:text-neutral-600;
+  }
+
+  .command-select {
+    @apply w-full px-4 py-2.5 rounded-lg text-sm transition-all duration-200;
+    @apply bg-surface-100 border border-surface-400 text-white;
+    @apply focus:outline-none focus:border-command-gold focus:ring-1 focus:ring-command-gold/30;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-surface-300 rounded;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-active {
+    @apply bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20;
+  }
+
+  .status-inactive {
+    @apply bg-neutral-500/10 text-neutral-400 ring-1 ring-neutral-500/20;
+  }
+
+  .status-suspended {
+    @apply bg-red-500/10 text-red-400 ring-1 ring-red-500/20;
+  }
+}
+
+/* Leaflet overrides for dark theme */
+.leaflet-container {
+  background: #0a0a0a !important;
+}
+
+.leaflet-tile-pane {
+  opacity: 0.6;
+  filter: brightness(0.6) contrast(1.1) saturate(0);
+}
+
+.leaflet-control-zoom a {
+  background: #111 !important;
+  color: #eee !important;
+  border-color: #333 !important;
+}
+
+.leaflet-control-attribution {
+  display: none !important;
+}

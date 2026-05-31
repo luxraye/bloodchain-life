@@ -1,0 +1,77 @@
+# =============================================================================
+# Bloodchain monorepo — Git ignore (init repo at this directory root)
+# =============================================================================
+
+# ── Dependencies & build output ─────────────────────────────────────────────
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+build/
+**/build/
+*.tsbuildinfo
+
+# Vite / tooling caches (outside node_modules)
+.vite/
+**/.vite/
+.turbo/
+.cache/
+**/.cache/
+coverage/
+**/coverage/
+
+# ── Environment & secrets (never commit) ────────────────────────────────────
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.local
+.secrets-backup/
+
+# ── Archives & local backups (Replit export, phase backups, etc.) ───────────
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+replit chain.zip
+**/pre_phase1_backup.zip
+**/*_backup.zip
+
+# ── Logs & OS / editor noise ────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── Cursor / local agent tooling (not part of the product) ───────────────────
+.agents/
+skills-lock.json
+.cursor/
+
+# ── Hyperledger Fabric / wallet material (if added for dev) ─────────────────
+**/wallet/
+**/fabric-network/
+**/*_sk
+**/keystore/
+**/signcerts/
+**/cacerts/

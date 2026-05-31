@@ -1,0 +1,68 @@
+/* ── Badge ──────────────────────────────────────────────────────────── */
+.bc-badge {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            5px;
+  padding:        3px 10px;
+  border-radius:  var(--bc-radius-full);
+  font-family:    var(--bc-font-sans);
+  font-size:      var(--bc-text-xs);
+  font-weight:    var(--bc-weight-bold);
+  letter-spacing: var(--bc-tracking-wide);
+  white-space:    nowrap;
+  border:         1px solid transparent;
+}
+
+.bc-badge__dot {
+  width:         6px;
+  height:        6px;
+  border-radius: var(--bc-radius-full);
+  flex-shrink:   0;
+  background:    currentColor;
+}
+
+/* ── Variants ───────────────────────────────────────────────────────── */
+.bc-badge--cleared {
+  color:        var(--bc-neon-green);
+  background:   rgba(0, 255, 136, 0.1);
+  border-color: rgba(0, 255, 136, 0.25);
+}
+.bc-badge--quarantined {
+  color:        var(--bc-neon-red);
+  background:   rgba(255, 45, 85, 0.1);
+  border-color: rgba(255, 45, 85, 0.25);
+}
+.bc-badge--transit {
+  color:        var(--bc-neon-blue);
+  background:   rgba(0, 200, 255, 0.1);
+  border-color: rgba(0, 200, 255, 0.25);
+}
+.bc-badge--pending {
+  color:        var(--bc-neon-amber);
+  background:   rgba(255, 184, 0, 0.1);
+  border-color: rgba(255, 184, 0, 0.25);
+}
+.bc-badge--archived {
+  color:        var(--bc-text-secondary);
+  background:   var(--bc-glass-bg);
+  border-color: var(--bc-glass-border);
+}
+.bc-badge--burg {
+  color:        var(--bc-burg-200);
+  background:   rgba(168, 31, 56, 0.15);
+  border-color: rgba(168, 31, 56, 0.3);
+}
+.bc-badge--azure {
+  color:        var(--bc-azure-300);
+  background:   rgba(58, 130, 184, 0.12);
+  border-color: rgba(58, 130, 184, 0.3);
+}
+
+/* ── Pulse (for urgent states) ──────────────────────────────────────── */
+.bc-badge--pulse {
+  animation: bc-badge-pulse 1.8s ease-in-out infinite;
+}
+@keyframes bc-badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%       { box-shadow: 0 0 8px 2px currentColor; opacity: 0.85; }
+}

@@ -1,0 +1,72 @@
+/* ── DonorCard ──────────────────────────────────────────────────────── */
+.bc-donor-card__header {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  gap:             var(--bc-space-3);
+  margin-bottom:   var(--bc-space-4);
+}
+
+.bc-donor-card--compact .bc-donor-card__header {
+  margin-bottom: 0;
+}
+
+.bc-donor-card__name {
+  font-size:      var(--bc-text-md);
+  font-weight:    var(--bc-weight-bold);
+  color:          var(--bc-text-primary);
+  letter-spacing: var(--bc-tracking-snug);
+  margin-bottom:  var(--bc-space-1);
+}
+
+.bc-donor-card__id {
+  font-family:    var(--bc-font-mono);
+  font-size:      var(--bc-text-xs);
+  color:          var(--bc-text-muted);
+  letter-spacing: var(--bc-tracking-wide);
+}
+
+.bc-donor-card__header-right {
+  display:     flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap:         var(--bc-space-2);
+  flex-shrink: 0;
+}
+
+.bc-donor-card__blood-type {
+  font-family:    var(--bc-font-sans);
+  font-size:      var(--bc-text-md);
+  font-weight:    var(--bc-weight-extrabold);
+  color:          var(--bc-burg-300);
+  letter-spacing: var(--bc-tracking-tight);
+}
+
+/* ── Stats row ──────────────────────────────────────────────────────── */
+.bc-donor-card__stats {
+  display:     flex;
+  gap:         var(--bc-space-6);
+  flex-wrap:   wrap;
+  padding-top: var(--bc-space-3);
+  border-top:  1px solid rgba(255,255,255,0.05);
+}
+
+.bc-donor-card__stat {
+  display:        flex;
+  flex-direction: column;
+  gap:            3px;
+}
+
+.bc-donor-card__stat-label {
+  font-size:      var(--bc-text-xs);
+  font-weight:    var(--bc-weight-bold);
+  letter-spacing: var(--bc-tracking-wider);
+  text-transform: uppercase;
+  color:          var(--bc-text-muted);
+}
+
+.bc-donor-card__stat-value {
+  font-size:   var(--bc-text-sm);
+  font-weight: var(--bc-weight-semibold);
+  color:       var(--bc-text-secondary);
+}

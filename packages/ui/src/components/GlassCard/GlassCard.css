@@ -1,0 +1,59 @@
+/* ── GlassCard ──────────────────────────────────────────────────────── */
+.bc-glass-card {
+  background:      var(--bc-glass-bg);
+  border:          1px solid var(--bc-glass-border);
+  border-radius:   var(--bc-radius-lg);
+  backdrop-filter: blur(var(--bc-glass-blur));
+  -webkit-backdrop-filter: blur(var(--bc-glass-blur));
+  position:        relative;
+  overflow:        hidden;
+  transition:
+    background     var(--bc-transition-base),
+    border-color   var(--bc-transition-base),
+    transform      var(--bc-transition-base),
+    box-shadow     var(--bc-transition-base);
+}
+
+/* ── Padding ────────────────────────────────────────────────────────── */
+.bc-glass-card--pad-sm { padding: var(--bc-space-3) var(--bc-space-4); }
+.bc-glass-card--pad-md { padding: var(--bc-space-5) var(--bc-space-6); }
+.bc-glass-card--pad-lg { padding: var(--bc-space-8) var(--bc-space-8); }
+
+/* ── Interactive ────────────────────────────────────────────────────── */
+.bc-glass-card--interactive {
+  cursor: pointer;
+}
+.bc-glass-card--interactive:hover {
+  background:   var(--bc-glass-bg-hover);
+  border-color: var(--bc-glass-border-hover);
+  transform:    translateY(-2px);
+  box-shadow:   var(--bc-shadow-md);
+}
+.bc-glass-card--interactive:active {
+  transform: translateY(0);
+}
+.bc-glass-card--interactive:focus-visible {
+  outline:        2px solid var(--bc-burg-500);
+  outline-offset: 2px;
+}
+
+/* ── Accent bars ────────────────────────────────────────────────────── */
+.bc-glass-card--accent-burg::before,
+.bc-glass-card--accent-azure::before,
+.bc-glass-card--accent-green::before,
+.bc-glass-card--accent-red::before,
+.bc-glass-card--accent-blue::before,
+.bc-glass-card--accent-amber::before {
+  content:       '';
+  position:      absolute;
+  top:           0; left: 0; right: 0;
+  height:        2px;
+  border-radius: var(--bc-radius-lg) var(--bc-radius-lg) 0 0;
+}
+
+.bc-glass-card--accent-burg::before  { background: var(--bc-burg-500); box-shadow: 0 0 12px rgba(168,31,56,0.5); }
+.bc-glass-card--accent-azure::before { background: var(--bc-azure-400); box-shadow: 0 0 12px rgba(0,200,255,0.3); }
+.bc-glass-card--accent-green::before { background: var(--bc-neon-green); box-shadow: 0 0 12px rgba(0,255,136,0.35); }
+.bc-glass-card--accent-red::before   { background: var(--bc-neon-red); box-shadow: 0 0 12px rgba(255,45,85,0.35); }
+.bc-glass-card--accent-blue::before  { background: var(--bc-neon-blue); box-shadow: 0 0 12px rgba(0,200,255,0.35); }
+.bc-glass-card--accent-amber::before { background: var(--bc-neon-amber); box-shadow: 0 0 12px rgba(255,184,0,0.35); }

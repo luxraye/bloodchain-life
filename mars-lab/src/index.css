@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Bloodchain Design Tokens ─────────────────────────────────────── */
+:root {
+  --bc-burg-500:  #A81F38;
+  --bc-burg-400:  #C4304E;
+  --bc-burg-300:  #D96070;
+  --bc-azure-500: #3A82B8;
+  --bc-azure-400: #5BA4D4;
+  --bc-azure-300: #8EC4E8;
+  --bc-neon-green: #00FF88;
+  --bc-neon-red:   #FF2D55;
+  --bc-neon-blue:  #00C8FF;
+  --bc-neon-amber: #FFB800;
+  --bc-glass-bg:     rgba(255,255,255,0.04);
+  --bc-glass-border: rgba(255,255,255,0.09);
+  --bc-text-primary:   #F0F4F8;
+  --bc-text-secondary: #8899A8;
+  --bc-text-muted:     #4A5568;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+html, body, #root { height: 100%; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background:  #07090F;
+  color:       #F0F4F8;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Mono utility ─────────────────────────────────────────────────── */
+.font-mono-ui {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #4A1020; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #6B1423; }
+
+.scroll-thin { scrollbar-width: thin; scrollbar-color: #4A1020 transparent; }
+
+/* ── Native select options — must use solid colours ───────────────────── */
+select option {
+  background-color: #111422;
+  color:            #F0F4F8;
+}
+select option:disabled {
+  color: #4A5568;
+}
+select option:checked,
+select option:hover {
+  background-color: #1C2030;
+}
+
+/* ── Selection ────────────────────────────────────────────────────── */
+::selection { background: rgba(168,31,56,0.35); color: #F0F4F8; }
+
+/* ── TTI result cell animations ───────────────────────────────────── */
+@keyframes reactive-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,45,85,0); }
+  50%      { box-shadow: 0 0 8px 2px rgba(255,45,85,0.4); }
+}
+.tti-reactive { animation: reactive-pulse 1.6s ease-in-out infinite; }
+
+/* ── Modal / card entry animations ───────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-fade-in { animation: fade-in 0.35s ease both; }
+
+/* ── Slide in from right (CustodyDrawer) ──────────────────────────────── */
+@keyframes slide-in-right {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.animate-slide-in-right { animation: slide-in-right 0.22s ease both; }
+
+/* ── Glass panel ──────────────────────────────────────────────────── */
+.glass {
+  background:      var(--bc-glass-bg);
+  border:          1px solid var(--bc-glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ── Instrument panel look ────────────────────────────────────────── */
+.instrument-panel {
+  background:    #0C0F1A;
+  border:        1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+}

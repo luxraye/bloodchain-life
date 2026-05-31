@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Bloodchain design tokens — bloodchain_design_system_preview.html */
+:root {
+  --burg-500: #A81F38;
+  --burg-400: #C4304E;
+  --burg-300: #D96070;
+  --azure-500: #3A82B8;
+  --azure-400: #5BA4D4;
+  --azure-300: #8EC4E8;
+  --neon-green: #00FF88;
+  --neon-red: #FF2D55;
+  --neon-blue: #00C8FF;
+  --neon-amber: #FFB800;
+  --bg-base: #07090F;
+  --bg-surface: #0C0F1A;
+  --bg-raised: #111422;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --text-primary: #F0F4F8;
+  --text-secondary: #8899A8;
+  --text-muted: #4A5568;
+}
+
+html, body, #root { height: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono-ui {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #4A1020; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #6B1423; }
+::selection { background: rgba(168, 31, 56, 0.35); color: #F0F4F8; }
+
+select option { background: #111422; color: #F0F4F8; }
+
+@layer components {
+  .btn-primary {
+    @apply font-semibold px-5 py-3 rounded-xl transition active:scale-[0.98] disabled:opacity-50 min-h-[44px];
+    background: var(--burg-500);
+    color: #fff;
+    box-shadow: 0 0 18px rgba(168, 31, 56, 0.35);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--burg-400); }
+
+  .btn-azure {
+    @apply font-semibold px-5 py-3 rounded-xl transition min-h-[44px];
+    background: var(--azure-700);
+    color: #fff;
+    border: 1px solid rgba(58, 130, 184, 0.4);
+  }
+  .btn-azure:hover { background: var(--azure-500); }
+
+  .btn-ghost {
+    @apply font-medium px-4 py-2.5 rounded-lg transition min-h-[44px];
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+  }
+
+  .btn-danger-ghost {
+    @apply font-semibold px-5 py-3 rounded-xl min-h-[44px];
+    background: rgba(255, 45, 85, 0.1);
+    border: 1px solid rgba(255, 45, 85, 0.35);
+    color: var(--neon-red);
+  }
+
+  .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    @apply rounded-xl;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl text-sm outline-none transition min-h-[44px];
+    background: var(--bg-raised);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: var(--text-primary);
+  }
+  .input-field::placeholder { color: var(--text-muted); }
+  .input-field:focus {
+    border-color: rgba(168, 31, 56, 0.65);
+    box-shadow: 0 0 0 3px rgba(168, 31, 56, 0.12);
+  }
+
+  .field-label {
+    @apply block text-[10px] font-semibold uppercase tracking-wider mb-1.5;
+    color: var(--text-secondary);
+  }
+  .field-hint {
+    @apply text-[10px] mt-1;
+    color: var(--text-muted);
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide;
+  }
+
+  .tab-active {
+    background: var(--burg-500) !important;
+    color: #fff !important;
+    box-shadow: 0 0 16px rgba(168, 31, 56, 0.3);
+  }
+
+  .tab-idle {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+  }
+}

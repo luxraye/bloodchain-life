@@ -1,0 +1,28 @@
+/* ── Select ─────────────────────────────────────────────────────────── */
+.bc-select-wrap { position: relative; }
+
+.bc-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 36px; /* room for chevron */
+}
+
+.bc-select option {
+  background: var(--bc-bg-raised);
+  color:      var(--bc-text-primary);
+}
+
+.bc-select__chevron {
+  position:    absolute;
+  right:       12px;
+  top:         50%;
+  transform:   translateY(-50%);
+  color:       var(--bc-text-muted);
+  font-size:   13px;
+  pointer-events: none;
+  transition:  color var(--bc-transition-fast);
+}
+.bc-select-wrap:focus-within .bc-select__chevron {
+  color: var(--bc-burg-400);
+}
