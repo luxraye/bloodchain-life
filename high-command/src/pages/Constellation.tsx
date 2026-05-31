@@ -45,7 +45,7 @@ export default function Constellation() {
               {mods.map((mod) => (
                 <a
                   key={mod.id}
-                  href={mod.localPath}
+                  href={mod.launchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glass-card p-4 block hover:border-[rgba(168,31,56,0.35)] transition group"

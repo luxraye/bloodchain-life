@@ -111,6 +111,7 @@ services:
       - key: NODE_VERSION
         value: "22.22.2"
       - fromGroup: bc-vite-api
+      - fromGroup: bc-demo-hub-links
       - key: VITE_SUPABASE_URL
         sync: false
       - key: VITE_SUPABASE_ANON_KEY

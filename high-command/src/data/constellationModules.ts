@@ -1,6 +1,6 @@
 /**
  * National Blood OS — module registry for High Command oversight.
- * URLs match demo-hub local defaults; override via env in production.
+ * Production URLs from VITE_* env (set on Render via bc-demo-hub-links group or per-service).
  */
 
 export type ModulePillar = 'operations' | 'clinical' | 'population' | 'governance'
@@ -14,13 +14,29 @@ export interface ConstellationModule {
   pillar: ModulePillar
   icon: string
   accentColor: string
-  localPath: string
+  launchUrl: string
   status: ModuleStatus
   demoMetric: { label: string; value: string }
   description: string
 }
 
-const host = (port: number) => `http://localhost:${port}?guest=1`
+function withGuest(url: string) {
+  if (!url) return ''
+  const target = new URL(url.startsWith('http') ? url : `https://${url}`)
+  target.searchParams.set('guest', '1')
+  return target.toString()
+}
+
+function isLocalHost() {
+  if (typeof window === 'undefined') return true
+  const h = window.location.hostname
+  return h === 'localhost' || h === '127.0.0.1'
+}
+
+function moduleUrl(envValue: string | undefined, productionUrl: string, localPort: number) {
+  const base = envValue || (isLocalHost() ? `http://localhost:${localPort}` : productionUrl)
+  return withGuest(base)
+}
 
 export const PILLAR_LABEL: Record<ModulePillar, string> = {
   operations: 'Supply chain operations',
@@ -37,7 +53,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'operations',
     icon: '✦',
     accentColor: '#00FF88',
-    localPath: host(5176),
+    launchUrl: moduleUrl(import.meta.env.VITE_SCYTHER_URL, 'https://scyther.bloodchain.life', 5176),
     status: 'live',
     demoMetric: { label: 'Drives this week', value: '12' },
     description: 'Donor eligibility, phlebotomy, ISBT labelling, mobile drives.',
@@ -49,7 +65,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'clinical',
     icon: '⬡',
     accentColor: '#5BA4D4',
-    localPath: host(5174),
+    launchUrl: moduleUrl(import.meta.env.VITE_MARS_LAB_URL, 'https://mars.bloodchain.life', 5174),
     status: 'live',
     demoMetric: { label: 'Testing queue', value: '9' },
     description: 'TTI screening, grouping, component QC, release documentation.',
@@ -61,7 +77,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'operations',
     icon: '➤',
     accentColor: '#84cc16',
-    localPath: host(5175),
+    launchUrl: moduleUrl(import.meta.env.VITE_VOYAGER_URL, 'https://voyager.bloodchain.life', 5175),
     status: 'alert',
     demoMetric: { label: 'In transit', value: '6' },
     description: 'Inter-facility transfers, custody handshakes, expiry alerts.',
@@ -73,7 +89,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'clinical',
     icon: '♦',
     accentColor: '#FF2D55',
-    localPath: host(5178),
+    launchUrl: moduleUrl(import.meta.env.VITE_TRANSFUSE_URL, 'https://transfuse.bloodchain.life', 5178),
     status: 'live',
     demoMetric: { label: 'Open requests', value: '4' },
     description: 'Blood orders, crossmatch, committee workflows, haemovigilance.',
@@ -85,7 +101,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'operations',
     icon: '◉',
     accentColor: '#00C8FF',
-    localPath: host(5177),
+    launchUrl: moduleUrl(import.meta.env.VITE_AZURE_URL, 'https://azure.bloodchain.life', 5177),
     status: 'live',
     demoMetric: { label: 'Pending KYC', value: '18' },
     description: 'Public registration, trust tiers, donation journey visibility.',
@@ -97,7 +113,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'population',
     icon: '⊕',
     accentColor: '#FFB800',
-    localPath: host(5180),
+    launchUrl: moduleUrl(import.meta.env.VITE_CHRONICLE_URL, 'https://chronicle.bloodchain.life', 5180),
     status: 'live',
     demoMetric: { label: 'Open exceptions', value: '6' },
     description: 'Haemophilia, sickle cell, thalassaemia — care gaps and cohorts.',
@@ -109,7 +125,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'population',
     icon: '⌬',
     accentColor: '#D96070',
-    localPath: host(5179),
+    launchUrl: moduleUrl(import.meta.env.VITE_HELIX_URL, 'https://helix.bloodchain.life', 5179),
     status: 'live',
     demoMetric: { label: 'Active studies', value: '3' },
     description: 'Specimen custody, participants, IRB-ready audit trails.',
@@ -121,7 +137,7 @@ export const CONSTELLATION_MODULES: ConstellationModule[] = [
     pillar: 'governance',
     icon: '⬛',
     accentColor: '#7c3aed',
-    localPath: host(5181),
+    launchUrl: moduleUrl(import.meta.env.VITE_SENTINEL_URL, 'https://sentinel.bloodchain.life', 5181),
     status: 'live',
     demoMetric: { label: 'Review queue', value: '3' },
     description: 'BMRA returns, QMS surveillance — reviewer console over Instances.',

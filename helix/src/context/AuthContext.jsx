@@ -66,10 +66,18 @@ export function AuthProvider({ children }) {
   const isReadOnly = user?.roles?.includes('ETHICS_READ') && !user?.roles?.some(r => ['RESEARCH_PI', 'RESEARCH_COORDINATOR', 'ADMIN', 'SUPER_ADMIN'].includes(r))
 
   const login = async (email, password) => {
-    if (demoMode || guestMode) { setSignedIn(true); return { error: null } }
+    if (demoMode) { setSignedIn(true); return { error: null } }
+    if (guestMode) { setSupaUser(GUEST_USER); setSignedIn(true); return { error: null } }
     if (!supabase) return { error: new Error('Supabase not configured') }
     const result = await supabase.auth.signInWithPassword({ email, password })
-    if (!result.error) setSignedIn(true)
+    if (!result.error) {
+      const p = parseUser(result.data.user)
+      setSupaUser(p)
+      setSignedIn(!!p)
+      // #region agent log
+      fetch('http://127.0.0.1:7833/ingest/3a3861b2-2a57-493a-b985-d4c4a7a35cc9',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'418f53'},body:JSON.stringify({sessionId:'418f53',location:'helix/AuthContext.jsx:login',message:'helix login ok',data:{hasUser:!!p,role:p?.role},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
+    }
     return { error: result.error }
   }
 
