@@ -21,7 +21,7 @@ export const listExceptions = async (_req: Request, res: Response, next: NextFun
 
 export const patchException = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await chronicRegistryService.patchException(req.params.id, req.body);
+    const data = await chronicRegistryService.patchException(String(req.params.id), req.body);
     res.json({ success: true, data });
   } catch (e) {
     next(e);

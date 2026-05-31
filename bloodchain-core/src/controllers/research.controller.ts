@@ -12,7 +12,7 @@ export const listStudies = async (_req: Request, res: Response, next: NextFuncti
 
 export const getStudy = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const study = await researchService.getStudyDetail(req.params.id);
+    const study = await researchService.getStudyDetail(String(req.params.id));
     if (!study) {
       res.status(404).json({ success: false, error: "Study not found" });
       return;
