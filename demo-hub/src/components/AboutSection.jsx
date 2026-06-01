@@ -13,7 +13,7 @@ const PILLARS = [
     color: '#5BA4D4',
     glow: 'rgba(58,130,184,0.2)',
     title: 'Clinical Integrity',
-    body: 'Role-based access ensures the right people see only what they need. Supervisory workflows, ISBT-128 labelling, and biohazard gates mirror real-world clinical protocols — built for safety, not convenience.',
+    body: 'Role-based access ensures the right people see only what they need. Supervisory workflows, standard labelling, and safety gates mirror real-world clinical protocols — built for safety, not convenience.',
   },
   {
     icon: '◉',
@@ -27,7 +27,7 @@ const PILLARS = [
     color: '#00C8FF',
     glow: 'rgba(0,200,255,0.15)',
     title: 'Built for Regulators',
-    body: 'SHA-256 document integrity, JWT-signed audit receipts, and append-only event logs give health ministries and regulatory bodies the evidence base they need — without manual data collection.',
+    body: 'Tamper-evident records, signed audit trails, and append-only event history give health ministries and regulatory bodies the evidence base they need — without manual data collection.',
   },
 ]
 
@@ -80,27 +80,6 @@ export default function AboutSection() {
             <p className="mx-auto max-w-md text-sm leading-relaxed text-[#8899A8]">
               {SITE.prototypeNote}
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              {[
-                { label: 'React 19 · Vite',    color: '#00C8FF' },
-                { label: 'Supabase Auth',       color: '#00FF88' },
-                { label: 'Postgres · Prisma',   color: '#A78BFA' },
-                { label: 'Render',              color: '#FFB800' },
-                { label: 'Hyperledger Fabric',  color: '#A81F38' },
-              ].map(({ label, color }) => (
-                <span
-                  key={label}
-                  className="rounded-lg border px-3 py-1 font-mono text-[10px] font-medium"
-                  style={{
-                    color,
-                    background:   `${color}12`,
-                    borderColor:  `${color}30`,
-                  }}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
           </div>
         </div>
       </div>

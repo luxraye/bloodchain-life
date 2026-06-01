@@ -9,7 +9,6 @@ export default function ConstellationSection() {
   return (
     <section id="constellation" className="relative py-20 border-t border-white/[0.06]">
 
-      {/* Left glow */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-0 top-1/2 -z-10 -translate-y-1/2 h-96 w-80 rounded-full opacity-[0.05] blur-[80px]"
@@ -18,7 +17,6 @@ export default function ConstellationSection() {
 
       <div className="mx-auto max-w-7xl px-6">
 
-        {/* ── Live modules ── */}
         <p className="mb-2 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-burg-400">
           The Platform
         </p>
@@ -26,12 +24,11 @@ export default function ConstellationSection() {
           {liveCount} applications. One shared core.
         </h2>
         <p className="mx-auto mb-10 max-w-xl text-center text-sm leading-relaxed text-[#8899A8]">
-          All constellation modules are live in this demo environment — each independently deployable, together forming a complete national blood management system.
+          Nine role-specific applications for donation, laboratory, logistics, clinical transfusion, chronic care, research, and national oversight — one custody chain from donor to patient.
         </p>
 
         <ConstellationCarousel apps={APPS} />
 
-        {/* Info bar */}
         <div className="mb-16 glass rounded-2xl p-5">
           <div className="flex items-start gap-4">
             <svg className="mt-0.5 h-4 w-4 shrink-0 text-[#4A5568]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -39,13 +36,13 @@ export default function ConstellationSection() {
             </svg>
             <div className="space-y-1 text-xs leading-relaxed text-[#8899A8]">
               <p>
-                <span className="font-semibold text-white">National & clinical</span> — High Command, Mars Lab, Voyager, Transfuse, Chronicle, Helix, and Sentinel open in a new tab with <span className="font-mono text-[10px]">?guest=1</span> demo sessions.
+                <span className="font-semibold text-white">National & clinical</span> — programme oversight, laboratory, logistics, hospital transfusion, chronic care, research, and regulatory modules each serve a distinct mandate in the blood system.
               </p>
               <p>
-                <span className="font-semibold text-white">Mobile / tablet</span> — Azure (iPhone) and Scyther (iPad) launch inside device frames with live iframes.
+                <span className="font-semibold text-white">Field & public</span> — collection and donor-facing capabilities support drives, eligibility, and the public donation journey.
               </p>
               <p>
-                <span className="font-semibold text-white">Standalone deployment</span> — each module authenticates independently and can be adopted without the full constellation.
+                <span className="font-semibold text-white">Briefings by appointment</span> — interactive walkthroughs are shared directly with your institution; this site describes the constellation, not open access to software.
               </p>
             </div>
           </div>
@@ -54,10 +51,10 @@ export default function ConstellationSection() {
         {!hasRoadmap ? (
           <div className="glass rounded-2xl border border-neon-green/20 p-6 text-center">
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-neon-green mb-2">
-              Constellation complete (demo)
+              Constellation map complete
             </p>
             <p className="text-sm text-[#8899A8] max-w-lg mx-auto">
-              Every service domain in the Bloodchain map now has a runnable module in this preview. Production rollout still requires clinical certification and regulatory sign-off.
+              Every service domain in the national blood programme has a dedicated module in the Bloodchain suite. Contact us to arrange a briefing.
             </p>
           </div>
         ) : (

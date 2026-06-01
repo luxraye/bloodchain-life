@@ -15,7 +15,7 @@ export const SITE = {
   incubationLine:  'Incubated by Unipod at the University of Botswana',
 
   prototypeNote:
-    'This is a live demonstration environment. Interfaces, data flows, and integrations represent the platform as built — pending formal clinical certification and regulatory sign-off before production deployment.',
+    'Bloodchain is developed for national blood programme use. Product briefings are available to authorised institutions; public rollout follows clinical certification and regulatory sign-off.',
 
   repoUrl: '',
 }

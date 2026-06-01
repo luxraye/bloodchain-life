@@ -11,20 +11,6 @@ const DEMO_DONOR = {
   phone: '71234567',
 }
 
-const GUEST_USER = {
-  id: 'guest-azure-001',
-  name: 'Demo Visitor',
-  email: 'guest@bloodchain.demo',
-  username: 'demo_guest',
-  role: 'PUBLIC',
-  roles: ['PUBLIC'],
-}
-
-function isGuestDemoSession() {
-  if (typeof window === 'undefined') return false
-  return new URLSearchParams(window.location.search).get('guest') === '1'
-}
-
 function parseUser(supaUser) {
   if (!supaUser) return null
   const role = (supaUser.app_metadata?.role ?? 'PUBLIC').toUpperCase()
@@ -43,14 +29,13 @@ const AuthCtx = createContext(null)
 
 export function AuthProvider({ children }) {
   const bypass = import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true'
-  const guestMode = isGuestDemoSession()
   const demoMode = !SUPABASE_CONFIGURED || bypass
-  const [signedIn, setSignedIn] = useState(guestMode)
-  const [supaUser, setSupaUser] = useState(null)
-  const [loading, setLoading] = useState(!guestMode && !demoMode)
+  const [signedIn, setSignedIn] = useState(demoMode)
+  const [supaUser, setSupaUser] = useState(demoMode ? DEMO_DONOR : null)
+  const [loading, setLoading] = useState(!demoMode)
 
   useEffect(() => {
-    if (demoMode || guestMode || !supabase) return
+    if (demoMode || !supabase) return
 
     supabase.auth.getSession().then(({ data }) => {
       const parsed = parseUser(data.session?.user ?? null)
@@ -67,44 +52,37 @@ export function AuthProvider({ children }) {
     })
 
     return () => subscription.unsubscribe()
-  }, [demoMode, guestMode])
+  }, [demoMode])
 
-  const user = !signedIn ? null : guestMode ? GUEST_USER : demoMode ? DEMO_DONOR : supaUser
+  const user = !signedIn ? null : demoMode ? DEMO_DONOR : supaUser
 
   const hasRole = (...check) => {
     if (!signedIn || !user) return false
     return check.some((r) => user.roles.includes(r.toUpperCase()))
   }
 
-  const exitGuestDemo = () => {
-    const nextUrl = new URL(window.location.href)
-    nextUrl.searchParams.delete('guest')
-    window.location.href = nextUrl.toString()
-  }
-
   const login = async (email, password) => {
-    if (guestMode) return { error: null }
     if (demoMode) {
       setSignedIn(true)
       return { error: null }
     }
     if (!supabase) return { error: new Error('Supabase not configured') }
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error) setSignedIn(true)
+    if (!error) {
+      const { data } = await supabase.auth.getUser()
+      setSupaUser(parseUser(data.user))
+      setSignedIn(true)
+    }
     return { error }
   }
 
   const loginWithOtp = async (email) => {
-    if (demoMode || guestMode) return { error: null }
+    if (demoMode) return { error: null }
     if (!supabase) return { error: new Error('Supabase not configured') }
     return supabase.auth.signInWithOtp({ email })
   }
 
   const logout = async () => {
-    if (guestMode) {
-      exitGuestDemo()
-      return
-    }
     setSignedIn(false)
     setSupaUser(null)
     if (!demoMode && supabase) await supabase.auth.signOut()
@@ -116,7 +94,7 @@ export function AuthProvider({ children }) {
         user,
         loading,
         hasRole,
-        isGuest: guestMode,
+        isGuest: false,
         isDemoMode: demoMode,
         login,
         loginWithOtp,

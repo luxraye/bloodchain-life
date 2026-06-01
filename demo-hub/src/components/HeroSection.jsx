@@ -35,7 +35,7 @@ export default function HeroSection({ onExploreClick }) {
         <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-burg-500/30 bg-burg-500/[0.08] px-5 py-2 animate-fade-up">
           <span className="h-1.5 w-1.5 rounded-full bg-burg-400 animate-glow" />
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-burg-300">
-            {SITE.organization} · Platform Preview
+            {SITE.organization} · National Blood Platform
           </span>
         </div>
 

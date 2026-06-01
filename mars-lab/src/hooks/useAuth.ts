@@ -1,17 +1,12 @@
 /**
  * useAuth — Mars Lab
  *
- * Priority order:
- * 1. No Supabase config   → DEMO_MODE: login page shows, "Access Lab Console"
- *                           signs in without credentials, logout returns to login
- * 2. ?guest=1 in URL      → guest demo session
- * 3. VITE_AUTH_BYPASS=true (dev only) → skip auth, use DEV_USER
- * 4. Real Supabase session
+ * No Supabase config → local demo login only (development).
+ * Production requires Supabase credentials and signed-in staff.
  */
 import { useState, useEffect } from 'react'
 import { supabase, SUPABASE_CONFIGURED } from '../lib/supabase'
 
-// ── Synthetic users ────────────────────────────────────────────────────
 const DEMO_USER = {
   id: 'demo-mars-001', name: 'Demo Analyst',
   email: 'demo@bloodchain.local', username: 'demo_analyst',
@@ -22,18 +17,8 @@ const DEV_USER = {
   email: 'dev@bloodchain.local', username: 'dev_lab',
   role: 'LAB', roles: ['LAB'],
 }
-const GUEST_USER = {
-  id: 'guest-mars-001', name: 'Demo Visitor',
-  email: 'guest@bloodchain.demo', username: 'demo_guest',
-  role: 'LAB', roles: ['LAB'],
-}
 
 export type AuthUser = typeof DEMO_USER
-
-function isGuestDemoSession() {
-  if (typeof window === 'undefined') return false
-  return new URLSearchParams(window.location.search).get('guest') === '1'
-}
 
 function parseUser(u: {
   id: string; email?: string
@@ -51,20 +36,14 @@ function parseUser(u: {
 
 export function useAuth() {
   const demoMode = !SUPABASE_CONFIGURED
-  const guest    = isGuestDemoSession()
   const bypass   = !demoMode && import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true'
 
-  // signedIn tracks whether the user has actively authenticated
-  // (even in demo mode we want them to click through the login screen)
-  const [signedIn, setSignedIn] = useState(bypass || guest)
-  const [user,     setUser]     = useState<AuthUser | null>(
-    guest ? GUEST_USER : bypass ? DEV_USER : null,
-  )
-  const [loading, setLoading]   = useState(!demoMode && !bypass && !guest)
+  const [signedIn, setSignedIn] = useState(bypass || demoMode)
+  const [user, setUser] = useState<AuthUser | null>(bypass ? DEV_USER : demoMode ? DEMO_USER : null)
+  const [loading, setLoading] = useState(!demoMode && !bypass)
 
-  // Real Supabase session listener
   useEffect(() => {
-    if (demoMode || bypass || guest || !supabase) return
+    if (demoMode || bypass || !supabase) return
 
     supabase.auth.getSession().then(({ data }) => {
       const parsed = parseUser(data.session?.user ?? null)
@@ -83,22 +62,17 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Active user (what components see) ─────────────────────────────
   const activeUser: AuthUser | null = !signedIn
     ? null
     : demoMode
       ? DEMO_USER
-      : guest
-        ? GUEST_USER
-        : bypass
-          ? DEV_USER
-          : user
+      : bypass
+        ? DEV_USER
+        : user
 
-  // ── hasRole ────────────────────────────────────────────────────────
   const hasRole = (...check: string[]) =>
     check.some(r => activeUser?.roles?.includes(r.toUpperCase()))
 
-  // ── login ──────────────────────────────────────────────────────────
   const login = async (email: string, password: string) => {
     if (demoMode) {
       setSignedIn(true)
@@ -106,20 +80,17 @@ export function useAuth() {
     }
     if (!supabase) return { error: new Error('Supabase not configured') }
     const result = await supabase.auth.signInWithPassword({ email, password })
-    if (!result.error) setSignedIn(true)
+    if (!result.error) {
+      const parsed = parseUser(result.data.user)
+      setUser(parsed)
+      setSignedIn(!!parsed)
+    }
     return result
   }
 
-  // ── logout ─────────────────────────────────────────────────────────
   const logout = async () => {
     setSignedIn(false)
     setUser(null)
-    if (guest) {
-      const url = new URL(window.location.href)
-      url.searchParams.delete('guest')
-      window.location.href = url.toString()
-      return
-    }
     if (demoMode || bypass) return
     await supabase?.auth.signOut()
   }
@@ -129,7 +100,7 @@ export function useAuth() {
     loading,
     roles: activeUser?.roles ?? [],
     hasRole,
-    isGuest:    guest,
+    isGuest: false,
     isDemoMode: demoMode,
     login,
     logout,

@@ -1,17 +1,12 @@
 # =============================================================================
-# Bloodchain — Render Blueprint (v2 / fresh stack)
+# Bloodchain — Render Blueprint
 # =============================================================================
 #
-# Use this after initializing a NEW Git repo and connecting it in Render.
-# Service names below are intentionally different from any prior Blueprint so
-# Render creates new resources instead of reusing broken state.
+# Hobby custom domains: use ONE slot on bc-demo-hub (bloodchain.life).
+# All other static apps use *.onrender.com — share those URLs directly when pitching.
+# API: bc-api.onrender.com (set VITE_API_URL in bc-vite-api after deploy).
 #
-# Deploy: Render Dashboard → New Blueprint → connect repo → branch → apply.
-#
-# Public URLs: https://bloodchain.life (demo hub) and https://<app>.bloodchain.life
-# DNS setup: docs/DNS-bloodchain.life.md
-#
-# Stack: bc-api + 9 static constellation apps + bc-demo-hub (11 services total).
+# Demo hub: marketing only (no public app links). See demo-hub/src/content/apps.js
 #
 # =============================================================================
 
@@ -24,29 +19,9 @@ databases:
 envVarGroups:
   - name: bc-vite-api
     envVars:
+      # Replace host after first bc-api deploy (Dashboard → bc-api → URL)
       - key: VITE_API_URL
-        value: https://api.bloodchain.life/api/v1
-
-  - name: bc-demo-hub-links
-    envVars:
-      - key: VITE_HIGH_COMMAND_URL
-        value: https://command.bloodchain.life
-      - key: VITE_MARS_LAB_URL
-        value: https://mars.bloodchain.life
-      - key: VITE_VOYAGER_URL
-        value: https://voyager.bloodchain.life
-      - key: VITE_SCYTHER_URL
-        value: https://scyther.bloodchain.life
-      - key: VITE_AZURE_URL
-        value: https://azure.bloodchain.life
-      - key: VITE_TRANSFUSE_URL
-        value: https://transfuse.bloodchain.life
-      - key: VITE_HELIX_URL
-        value: https://helix.bloodchain.life
-      - key: VITE_CHRONICLE_URL
-        value: https://chronicle.bloodchain.life
-      - key: VITE_SENTINEL_URL
-        value: https://sentinel.bloodchain.life
+        value: https://bc-api-lu8j.onrender.com/api/v1
 
 services:
   - type: web
@@ -58,8 +33,6 @@ services:
     buildCommand: yarn install && yarn prisma generate && yarn build
     startCommand: yarn prisma migrate deploy && yarn start
     healthCheckPath: /health
-    domains:
-      - api.bloodchain.life
     envVars:
       - key: NODE_VERSION
         value: "22.22.2"
@@ -75,13 +48,13 @@ services:
         sync: false
 
   - type: web
-    name: bc-azure
+    name: bc-demo-hub
     runtime: static
-    rootDir: azure
-    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    rootDir: demo-hub
+    buildCommand: cd .. && yarn install && yarn workspace demo-hub build
     staticPublishPath: dist
     domains:
-      - azure.bloodchain.life
+      - bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -89,20 +62,13 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22.22.2"
-      - fromGroup: bc-vite-api
-      - key: VITE_SUPABASE_URL
-        sync: false
-      - key: VITE_SUPABASE_ANON_KEY
-        sync: false
 
   - type: web
     name: bc-high-command
     runtime: static
     rootDir: high-command
-    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace @bloodchain/ui build && yarn workspace high-command build
     staticPublishPath: dist
-    domains:
-      - command.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -111,7 +77,6 @@ services:
       - key: NODE_VERSION
         value: "22.22.2"
       - fromGroup: bc-vite-api
-      - fromGroup: bc-demo-hub-links
       - key: VITE_SUPABASE_URL
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
@@ -121,10 +86,8 @@ services:
     name: bc-mars-lab
     runtime: static
     rootDir: mars-lab
-    buildCommand: yarn install && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace mars-lab build
     staticPublishPath: dist
-    domains:
-      - mars.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -144,10 +107,8 @@ services:
     name: bc-scyther
     runtime: static
     rootDir: scyther
-    buildCommand: yarn install && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace scyther build
     staticPublishPath: dist
-    domains:
-      - scyther.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -165,10 +126,27 @@ services:
     name: bc-voyager
     runtime: static
     rootDir: voyager
-    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace @bloodchain/ui build && yarn workspace voyager build
     staticPublishPath: dist
-    domains:
-      - voyager.bloodchain.life
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "22.22.2"
+      - fromGroup: bc-vite-api
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  - type: web
+    name: bc-azure
+    runtime: static
+    rootDir: azure
+    buildCommand: cd .. && yarn install && yarn workspace @bloodchain/ui build && yarn workspace azure build
+    staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
@@ -186,10 +164,8 @@ services:
     name: bc-transfuse
     runtime: static
     rootDir: transfuse
-    buildCommand: yarn install && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace transfuse build
     staticPublishPath: dist
-    domains:
-      - transfuse.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -207,10 +183,8 @@ services:
     name: bc-helix
     runtime: static
     rootDir: helix
-    buildCommand: yarn install && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace helix build
     staticPublishPath: dist
-    domains:
-      - helix.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -228,10 +202,8 @@ services:
     name: bc-chronicle
     runtime: static
     rootDir: chronicle
-    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace @bloodchain/ui build && yarn workspace chronicle build
     staticPublishPath: dist
-    domains:
-      - chronicle.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -249,10 +221,8 @@ services:
     name: bc-sentinel
     runtime: static
     rootDir: sentinel
-    buildCommand: yarn install && yarn workspace @bloodchain/ui build && yarn build
+    buildCommand: cd .. && yarn install && yarn workspace @bloodchain/ui build && yarn workspace sentinel build
     staticPublishPath: dist
-    domains:
-      - sentinel.bloodchain.life
     routes:
       - type: rewrite
         source: /*
@@ -271,20 +241,3 @@ services:
         sync: false
       - key: VITE_INSTANCES_ADMIN_URL
         sync: false
-
-  - type: web
-    name: bc-demo-hub
-    runtime: static
-    rootDir: demo-hub
-    buildCommand: yarn install && yarn build
-    staticPublishPath: dist
-    domains:
-      - bloodchain.life
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: NODE_VERSION
-        value: "22.22.2"
-      - fromGroup: bc-demo-hub-links

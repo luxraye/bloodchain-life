@@ -1,7 +1,5 @@
 import { supabase } from './supabase.js'
-
-const isGuestDemo = () =>
-  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('guest') === '1'
+import { isDemoSession } from './isDemoSession.js'
 
 const DEMO_USERS = [
   { id: 'donor-001', name: 'Naledi Moagi', email: 'naledi@example.com', bloodType: 'O+', phone: '71234567', status: 'ELIGIBLE', totalDonations: 3 },
@@ -29,8 +27,8 @@ async function getAccessToken() {
 }
 
 async function authFetch(path, options = {}) {
-  if (isGuestDemo()) {
-    throw new Error('Guest demo mode blocks all network requests')
+  if (isDemoSession()) {
+    throw new Error('Demo mode blocks all network requests')
   }
 
   const token = await getAccessToken()
@@ -55,7 +53,7 @@ async function authFetch(path, options = {}) {
 }
 
 export async function getUsers() {
-  if (isGuestDemo()) {
+  if (isDemoSession()) {
     return { data: DEMO_USERS }
   }
   const json = await authFetch('/admin/users')
@@ -63,7 +61,7 @@ export async function getUsers() {
 }
 
 export async function getAssets() {
-  if (isGuestDemo()) {
+  if (isDemoSession()) {
     const assets = DEMO_ASSETS.map((a) => ({
       id: a.id,
       donorId: a.donorId,
@@ -93,7 +91,7 @@ export async function getAssets() {
 }
 
 export async function createBloodAsset(payload) {
-  if (isGuestDemo()) {
+  if (isDemoSession()) {
     return {
       data: {
         id: `demo-unit-${Date.now()}`,

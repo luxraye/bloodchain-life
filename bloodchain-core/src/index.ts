@@ -43,12 +43,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // ─── Health Check ────────────────────────────────────
 
+const healthPayload = () => ({
+    status: "operational",
+    service: "Bloodchain Core",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+});
+
 app.get("/health", (_req, res) => {
+    res.status(200).json(healthPayload());
+});
+
+// Render / browser smoke tests often hit `/` — guide to `/health` and `/api/v1`
+app.get("/", (_req, res) => {
     res.status(200).json({
-        status: "operational",
-        service: "Bloodchain Core",
-        version: "1.0.0",
-        timestamp: new Date().toISOString(),
+        ...healthPayload(),
+        hint: "API routes are under /api/v1 — e.g. GET /api/v1/admin/users",
     });
 });
 

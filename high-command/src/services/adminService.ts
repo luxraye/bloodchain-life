@@ -200,16 +200,9 @@ export const adminService = {
             const res = await api.get<ApiResponse<User[]>>('/admin/users', { params: queryParams });
             const meta = res.data.meta as Record<string, number> | undefined;
             const users = res.data.data ?? [];
-            // #region agent log
-            fetch('http://127.0.0.1:7833/ingest/3a3861b2-2a57-493a-b985-d4c4a7a35cc9',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'418f53'},body:JSON.stringify({sessionId:'418f53',location:'adminService.ts:fetchUsers',message:'users loaded',data:{count:users.length,apiBase:String(api.defaults.baseURL)},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-            // #endregion
             if (import.meta.env.DEV && users.length === 0) return filterDemoUsers(params);
             return { users, total: meta?.total ?? users.length };
-        } catch (err: unknown) {
-            const ax = err as { code?: string; message?: string; response?: { status?: number } };
-            // #region agent log
-            fetch('http://127.0.0.1:7833/ingest/3a3861b2-2a57-493a-b985-d4c4a7a35cc9',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'418f53'},body:JSON.stringify({sessionId:'418f53',location:'adminService.ts:fetchUsers',message:'users fetch failed',data:{apiBase:String(api.defaults.baseURL),code:ax.code,status:ax.response?.status,errMsg:ax.message?.slice(0,80)},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-            // #endregion
+        } catch {
             if (import.meta.env.DEV) return filterDemoUsers(params);
             throw new Error('Failed to load users');
         }

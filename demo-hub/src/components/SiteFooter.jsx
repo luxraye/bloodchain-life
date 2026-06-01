@@ -59,22 +59,10 @@ export default function SiteFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-neon-green animate-glow" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4A5568]">
-              Platform preview — live
-            </span>
-          </div>
-          <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[#2E3548]">
-            <span>React 19</span>
-            <span>·</span>
-            <span>Supabase</span>
-            <span>·</span>
-            <span>Postgres</span>
-            <span>·</span>
-            <span>Render</span>
-          </div>
+        <div className="mt-10 pt-6 border-t border-white/[0.05] text-center">
+          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#4A5568]">
+            National blood platform — briefing by appointment
+          </span>
         </div>
       </div>
     </footer>

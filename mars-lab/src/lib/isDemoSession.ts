@@ -1,7 +1,7 @@
-import { SUPABASE_CONFIGURED } from './supabase.js'
+import { SUPABASE_CONFIGURED } from './supabase'
 
-/** True when Azure should use in-app demo data (local dev bypass or no Supabase). */
-export function isDemoSession() {
+/** Local-only demo data when Supabase is not configured (development). */
+export function isDemoSession(): boolean {
   if (typeof window === 'undefined') return false
   if (import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true') return true
   if (!SUPABASE_CONFIGURED) return true

@@ -57,19 +57,6 @@ export default function ConstellationDetailPanel({ app, onClose }) {
 
           <p className="mb-5 text-sm leading-relaxed text-[#8899A8]">{app.description}</p>
 
-          {app.stack && (
-            <div className="mb-5 flex flex-wrap gap-1.5">
-              {app.stack.map((tech) => (
-                <span
-                  key={tech}
-                  className="rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-[#8899A8]"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
-
           <AppLaunchPanel app={app} compact />
 
           <button

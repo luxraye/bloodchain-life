@@ -6,14 +6,10 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 
-const isGuestDemo =
-  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('guest') === '1'
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: isGuestDemo ? false : undefined,
     },
   },
 })

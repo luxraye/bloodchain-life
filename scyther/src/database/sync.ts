@@ -1,11 +1,9 @@
 import { synchronize } from '@nozbe/watermelondb/sync';
-import api from '../lib/api'; // Standard interceptor injects Bearer token automatically
-
-const isGuestDemo = () =>
-  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('guest') === '1'
+import api from '../lib/api';
+import { isDemoSession } from '../lib/isDemoSession.js';
 
 export async function syncWithCore(database) {
-  if (isGuestDemo()) {
+  if (isDemoSession()) {
     return { database, skipped: true }
   }
 

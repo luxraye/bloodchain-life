@@ -45,19 +45,6 @@ export default function AppCard({ app }) {
           {app.description}
         </p>
 
-        {app.stack && (
-          <div className="mb-4 flex flex-wrap gap-1.5">
-            {app.stack.map((tech) => (
-              <span
-                key={tech}
-                className="rounded-md border border-white/[0.07] bg-white/[0.03] px-2 py-0.5 font-mono text-[9px] text-[#4A5568]"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
-
         <AppLaunchPanel app={app} />
       </div>
     </div>

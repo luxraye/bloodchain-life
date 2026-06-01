@@ -1,7 +1,5 @@
 import apiClient from '../lib/api.js'
-
-const isGuestDemo = () =>
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('guest') === '1'
+import { isDemoSession } from '../lib/isDemoSession.js'
 
 const DEMO_PROFILE = {
     id: 'guest-voyager-001',
@@ -21,7 +19,7 @@ const STATUS_LABELS = {
 // ── Assets ───────────────────────────────────────────
 
 export async function getBloodAssets(status) {
-    if (isGuestDemo()) return []
+    if (isDemoSession()) return []
     try {
         const url = status ? `/assets?status=${status}` : '/assets'
         const { data } = await apiClient.get(url)
@@ -30,17 +28,17 @@ export async function getBloodAssets(status) {
 }
 
 export async function getAsset(id) {
-    if (isGuestDemo()) return null
+    if (isDemoSession()) return null
     try { const { data } = await apiClient.get(`/assets/${id}`); return data.data ?? null } catch { return null }
 }
 
 export async function getAssetCustody(id) {
-    if (isGuestDemo()) return { id, events: [] }
+    if (isDemoSession()) return { id, events: [] }
     try { const { data } = await apiClient.get(`/assets/${id}/custody`); return data } catch { return null }
 }
 
 export async function scanAsset(assetId, newStatus, location, notes) {
-    if (isGuestDemo()) return { id: assetId, status: newStatus, currentLocation: location, notes }
+    if (isDemoSession()) return { id: assetId, status: newStatus, currentLocation: location, notes }
     const { data } = await apiClient.post('/assets/scan', { assetId, newStatus, location, notes })
     return data.data
 }
@@ -48,7 +46,7 @@ export async function scanAsset(assetId, newStatus, location, notes) {
 // ── Profile ───────────────────────────────────────────
 
 export async function getMyProfile() {
-    if (isGuestDemo()) {
+    if (isDemoSession()) {
         try {
             return JSON.parse(sessionStorage.getItem('voyager_guest_profile') || 'null') ?? DEMO_PROFILE
         } catch {
@@ -59,7 +57,7 @@ export async function getMyProfile() {
 }
 
 export async function updateMyProfile(payload) {
-    if (isGuestDemo()) {
+    if (isDemoSession()) {
         const updated = { ...(await getMyProfile()), ...payload }
         sessionStorage.setItem('voyager_guest_profile', JSON.stringify(updated))
         return updated

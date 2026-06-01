@@ -11,20 +11,6 @@ const DEV_USER = {
   roles: ['LOGISTICS_COMMAND'],
 }
 
-const GUEST_USER = {
-  id: 'guest-voyager-001',
-  name: DEMO_COORDINATOR.name,
-  email: 'guest@bloodchain.demo',
-  username: 'demo_guest',
-  role: 'LOGISTICS_COMMAND',
-  roles: ['LOGISTICS_COMMAND', 'TRANSIT'],
-}
-
-function isGuestDemoSession() {
-  if (typeof window === 'undefined') return false
-  return new URLSearchParams(window.location.search).get('guest') === '1'
-}
-
 function parseUser(supaUser) {
   if (!supaUser) return null
   const role = (supaUser.app_metadata?.role ?? 'PUBLIC').toUpperCase()
@@ -42,14 +28,13 @@ const AuthCtx = createContext(null)
 
 export function AuthProvider({ children }) {
   const bypass = import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true'
-  const guestMode = isGuestDemoSession()
   const demoMode = !SUPABASE_CONFIGURED || bypass
-  const [signedIn, setSignedIn] = useState(guestMode)
-  const [supaUser, setSupaUser] = useState(null)
-  const [loading, setLoading] = useState(!guestMode && !demoMode)
+  const [signedIn, setSignedIn] = useState(demoMode)
+  const [supaUser, setSupaUser] = useState(demoMode ? DEV_USER : null)
+  const [loading, setLoading] = useState(!demoMode)
 
   useEffect(() => {
-    if (demoMode || guestMode || !supabase) return
+    if (demoMode || !supabase) return
 
     supabase.auth.getSession().then(({ data }) => {
       const parsed = parseUser(data.session?.user ?? null)
@@ -66,40 +51,32 @@ export function AuthProvider({ children }) {
     })
 
     return () => subscription.unsubscribe()
-  }, [demoMode, guestMode])
+  }, [demoMode])
 
-  const user = !signedIn ? null : guestMode ? GUEST_USER : demoMode ? DEV_USER : supaUser
+  const user = !signedIn ? null : demoMode ? DEV_USER : supaUser
 
   const hasRole = (...check) => {
     if (!signedIn || !user) return false
-    if (guestMode) return check.some((r) => GUEST_USER.roles.includes(r.toUpperCase()))
     if (demoMode) return check.some((r) => DEV_USER.roles.includes(r.toUpperCase()))
     return check.some((r) => r.toUpperCase() === user.role)
   }
 
-  const exitGuestDemo = () => {
-    const nextUrl = new URL(window.location.href)
-    nextUrl.searchParams.delete('guest')
-    window.location.href = nextUrl.toString()
-  }
-
   const login = async (email, password) => {
-    if (guestMode) return { error: null }
     if (demoMode) {
       setSignedIn(true)
       return { error: null }
     }
     if (!supabase) return { error: new Error('Supabase not configured') }
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error) setSignedIn(true)
-    return { error }
+    const result = await supabase.auth.signInWithPassword({ email, password })
+    if (!result.error) {
+      const parsed = parseUser(result.data.user)
+      setSupaUser(parsed)
+      setSignedIn(!!parsed)
+    }
+    return { error: result.error }
   }
 
   const logout = async () => {
-    if (guestMode) {
-      exitGuestDemo()
-      return
-    }
     setSignedIn(false)
     setSupaUser(null)
     if (!demoMode && supabase) await supabase.auth.signOut()
@@ -112,7 +89,7 @@ export function AuthProvider({ children }) {
         loading,
         roles: user?.roles ?? (user ? [user.role] : []),
         hasRole,
-        isGuest: guestMode,
+        isGuest: false,
         isDemoMode: demoMode,
         login,
         logout,

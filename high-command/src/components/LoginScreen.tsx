@@ -9,7 +9,7 @@ const FEATURES = [
 ]
 
 export default function LoginScreen() {
-  const { login, isDemoMode, isGuest } = useAuth()
+  const { login, isDemoMode } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -33,10 +33,6 @@ export default function LoginScreen() {
     setLoading(true)
     await login('', '')
     setLoading(false)
-  }
-
-  if (isGuest) {
-    return null
   }
 
   return (
@@ -67,7 +63,7 @@ export default function LoginScreen() {
         <div className="w-full max-w-sm">
           {isDemoMode && (
             <div className="mb-4 rounded-xl px-4 py-3 text-xs" style={{ background: 'rgba(168,31,56,0.12)', color: '#D96070', border: '1px solid rgba(168,31,56,0.25)' }}>
-              Demo mode — enter without credentials or use <code className="font-mono">?guest=1</code>
+              Local development — auth bypass enabled (not available in production builds).
             </div>
           )}
           <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-6 shadow-2xl">

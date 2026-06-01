@@ -20,13 +20,6 @@ export interface ConstellationModule {
   description: string
 }
 
-function withGuest(url: string) {
-  if (!url) return ''
-  const target = new URL(url.startsWith('http') ? url : `https://${url}`)
-  target.searchParams.set('guest', '1')
-  return target.toString()
-}
-
 function isLocalHost() {
   if (typeof window === 'undefined') return true
   const h = window.location.hostname
@@ -34,8 +27,7 @@ function isLocalHost() {
 }
 
 function moduleUrl(envValue: string | undefined, productionUrl: string, localPort: number) {
-  const base = envValue || (isLocalHost() ? `http://localhost:${localPort}` : productionUrl)
-  return withGuest(base)
+  return envValue || (isLocalHost() ? `http://localhost:${localPort}` : productionUrl)
 }
 
 export const PILLAR_LABEL: Record<ModulePillar, string> = {

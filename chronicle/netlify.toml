@@ -1,0 +1,11 @@
+[build]
+  command = "cd .. && yarn install && yarn workspace @bloodchain/ui build && yarn workspace chronicle build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

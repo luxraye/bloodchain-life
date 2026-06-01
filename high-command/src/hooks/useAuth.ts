@@ -1,6 +1,6 @@
 /**
  * useAuth — High Command (ADMIN access only)
- * Supabase-powered. Preserves VITE_AUTH_BYPASS for demo mode.
+ * Supabase-powered. Preserves VITE_AUTH_BYPASS for local dev only.
  */
 import { useState, useEffect } from 'react'
 import { supabase, SUPABASE_CONFIGURED } from '../lib/supabase'
@@ -23,20 +23,6 @@ const DEV_USER: AuthUser = {
   roles: ['ADMIN'],
 }
 
-const GUEST_USER: AuthUser = {
-  id: 'guest-hc-001',
-  name: 'Demo Visitor',
-  email: 'guest@bloodchain.demo',
-  username: 'demo_guest',
-  role: 'ADMIN',
-  roles: ['ADMIN'],
-}
-
-function isGuestDemoSession() {
-  if (typeof window === 'undefined') return false
-  return new URLSearchParams(window.location.search).get('guest') === '1'
-}
-
 function parseUser(supaUser: { id: string; email?: string; app_metadata?: Record<string, string>; user_metadata?: Record<string, string> } | null): AuthUser | null {
   if (!supaUser) return null
   const role = (supaUser.app_metadata?.role ?? 'PUBLIC').toUpperCase()
@@ -52,14 +38,12 @@ function parseUser(supaUser: { id: string; email?: string; app_metadata?: Record
 
 export function useAuth() {
   const bypass = import.meta.env.DEV && import.meta.env.VITE_AUTH_BYPASS === 'true'
-  const guest = isGuestDemoSession()
   const demoMode = !SUPABASE_CONFIGURED || bypass
-  const fallbackUser = guest ? GUEST_USER : demoMode ? DEV_USER : null
-  const [user, setUser] = useState<AuthUser | null>(fallbackUser)
-  const [loading, setLoading] = useState(!(demoMode || guest))
+  const [user, setUser] = useState<AuthUser | null>(demoMode ? DEV_USER : null)
+  const [loading, setLoading] = useState(!demoMode)
 
   useEffect(() => {
-    if (demoMode || guest || !supabase) return
+    if (demoMode || !supabase) return
 
     supabase.auth.getSession().then(({ data }) => {
       setUser(parseUser(data.session?.user ?? null))
@@ -72,34 +56,27 @@ export function useAuth() {
     })
 
     return () => subscription.unsubscribe()
-  }, [demoMode, guest])
+  }, [demoMode])
 
   const hasRole = (...check: string[]) =>
-    guest
-      ? check.some(r => GUEST_USER.roles.includes(r.toUpperCase()))
-      : demoMode
+    demoMode
       ? check.some(r => DEV_USER.roles.includes(r.toUpperCase()))
       : check.some(r => r.toUpperCase() === user?.role)
 
-  const exitGuestDemo = () => {
-    if (typeof window === 'undefined') return
-    const nextUrl = new URL(window.location.href)
-    nextUrl.searchParams.delete('guest')
-    window.location.href = nextUrl.toString()
-  }
-
   return {
-    user: guest ? GUEST_USER : demoMode ? DEV_USER : user,
+    user: demoMode ? DEV_USER : user,
     loading,
-    roles: guest ? GUEST_USER.roles : demoMode ? DEV_USER.roles : (user ? [user.role] : []),
+    roles: demoMode ? DEV_USER.roles : (user ? [user.role] : []),
     hasRole,
-    isGuest: guest,
+    isGuest: false,
     isDemoMode: demoMode,
     login: async (email: string, password: string) => {
-      if (demoMode || guest) return { error: null }
+      if (demoMode) return { error: null }
       if (!supabase) return { error: new Error('Supabase not configured') }
-      return supabase.auth.signInWithPassword({ email, password })
+      const result = await supabase.auth.signInWithPassword({ email, password })
+      if (!result.error) setUser(parseUser(result.data.user))
+      return { error: result.error }
     },
-    logout: () => guest ? Promise.resolve(exitGuestDemo()) : supabase?.auth.signOut() ?? Promise.resolve(),
+    logout: () => supabase?.auth.signOut() ?? Promise.resolve(),
   }
 }
