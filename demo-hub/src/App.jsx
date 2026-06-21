@@ -7,8 +7,26 @@ import ConstellationSection from './components/ConstellationSection'
 import AboutSection     from './components/AboutSection'
 import ContactSection   from './components/ContactSection'
 import SiteFooter       from './components/SiteFooter'
+import BespokeDemo      from './components/BespokeDemo'
+import { getBespokeDemo } from './content/bespoke'
+
+// Unlisted, target-specific entry points: /demo/<slug> (e.g. /demo/blb).
+// Resolved client-side without a router so the public marketing build stays
+// dependency-free; Vite's SPA fallback serves index.html for these deep links.
+function resolveBespokeSlug() {
+  if (typeof window === 'undefined') return null
+  const match = window.location.pathname.match(/^\/demo\/([a-z0-9-]+)\/?$/i)
+  return match ? match[1] : null
+}
 
 export default function App() {
+  const bespoke = getBespokeDemo(resolveBespokeSlug())
+  if (bespoke) return <BespokeDemo demo={bespoke} />
+
+  return <MarketingSite />
+}
+
+function MarketingSite() {
   const constellationRef = useRef(null)
 
   function scrollToConstellation() {

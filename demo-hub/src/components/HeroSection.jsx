@@ -1,10 +1,10 @@
 import { SITE } from '../content/site'
 
 const STATS = [
-  { value: '8',    label: 'Service domains'   },
-  { value: '9',    label: 'Platform modules'  },
-  { value: 'E2E',  label: 'Audit ledger'      },
-  { value: '100%', label: 'Digital — no paper' },
+  { value: '1',    label: 'Start with one module' },
+  { value: '9',    label: 'Interoperable modules'  },
+  { value: 'E2E',  label: 'Shared custody core'    },
+  { value: '0',    label: 'Paper forms'            },
 ]
 
 export default function HeroSection({ onExploreClick }) {
@@ -35,7 +35,7 @@ export default function HeroSection({ onExploreClick }) {
         <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-burg-500/30 bg-burg-500/[0.08] px-5 py-2 animate-fade-up">
           <span className="h-1.5 w-1.5 rounded-full bg-burg-400 animate-glow" />
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-burg-300">
-            {SITE.organization} · National Blood Platform
+            {SITE.organization} · {SITE.projectEyebrow}
           </span>
         </div>
 
@@ -58,7 +58,7 @@ export default function HeroSection({ onExploreClick }) {
           className="mx-auto mb-12 max-w-xl text-sm leading-relaxed text-[#4A5568] animate-fade-up"
           style={{ animationDelay: '0.22s', animationFillMode: 'both', opacity: 0 }}
         >
-          Purpose-built software platforms for blood donation, laboratory operations, logistics, clinical transfusion, chronic disease management, regulatory compliance, research, and national oversight.
+          Each module — collection, donor portal, laboratory, transfusion safety, chronic care, logistics, oversight — works on its own and clicks into the same custody core. Adopt one to solve today's problem; add the rest when you're ready.
         </p>
 
         {/* CTAs */}

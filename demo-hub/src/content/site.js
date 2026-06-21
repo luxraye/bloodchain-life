@@ -8,14 +8,15 @@ export const SITE = {
   contactPhoneTel: '+26772161038',
 
   projectTitle:    'Bloodchain',
-  projectTagline:  'The national blood chain, digitized.',
-  projectSubtitle: 'Nine connected apps for donation, lab, logistics, transfusion, chronic care, research, and oversight — one custody chain from donor to patient.',
+  projectEyebrow:  'Modular Blood Supply Infrastructure',
+  projectTagline:  'Modular blood-supply infrastructure.',
+  projectSubtitle: 'Start with one module — or run the whole chain. Plug-and-play software for community blood drives, donor retention, hospital transfusion safety, laboratory screening, and chronic care, deployed institution by institution.',
 
   organization:    'Bloodchain Botswana',
   incubationLine:  'Incubated by Unipod at the University of Botswana',
 
   prototypeNote:
-    'Bloodchain is developed for national blood programme use. Product briefings are available to authorised institutions; public rollout follows clinical certification and regulatory sign-off.',
+    'Bloodchain is modular: every application runs on its own or connects through one shared custody core. Institutions adopt the modules they need today and extend later — no rip-and-replace. Live demonstrations are arranged by appointment.',
 
   repoUrl: '',
 }
