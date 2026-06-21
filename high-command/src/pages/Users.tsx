@@ -160,7 +160,10 @@ function CreateUserModal({ onClose, onSuccess }: { onClose: () => void; onSucces
                             <option value="MEDICAL">Medical Staff</option>
                             <option value="LAB">Lab Technician</option>
                             <option value="TRANSIT">Transit / Courier</option>
+                            <option value="LOGISTICS_COMMAND">Logistics Command</option>
+                            <option value="MOH_AUDITOR">MoH Auditor</option>
                             <option value="ADMIN">Administrator</option>
+                            <option value="SUPER_ADMIN">Super Admin</option>
                         </select>
                     </div>
 
@@ -412,7 +415,7 @@ export default function Users() {
 
             {/* Filters */}
             <div className="flex items-center gap-3">
-                {['ALL', 'ADMIN', 'MEDICAL', 'LAB', 'TRANSIT', 'PUBLIC'].map((role) => (
+                {['ALL', 'SUPER_ADMIN', 'ADMIN', 'MOH_AUDITOR', 'LOGISTICS_COMMAND', 'MEDICAL', 'LAB', 'TRANSIT', 'PUBLIC'].map((role) => (
                     <button
                         key={role}
                         onClick={() => setRoleFilter(role)}
