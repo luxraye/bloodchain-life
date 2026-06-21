@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { findDonorByOmang, canDonate, daysSinceLastDonation } from '../../lib/collectionHelpers.js';
+import { verifyOmang, isReturningDonor, getDriveMeta } from '../../data/seedCommunityDrive.js';
 import {
     QrCode,
     Search,
@@ -13,10 +14,15 @@ import {
     ArrowRight,
     ShieldAlert,
     Scan,
+    Fingerprint,
+    ShieldCheck,
+    History,
+    Link2,
+    Users,
 } from 'lucide-react';
 
 export default function DonorCheckIn() {
-    const { donors, donorsLoading, setActiveDonor, addNotification } = useApp();
+    const { donors, donorsLoading, drive, setActiveDonor, addNotification } = useApp();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [donor, setDonor] = useState(null);
@@ -66,6 +72,9 @@ export default function DonorCheckIn() {
 
     const eligible = donor ? canDonate(donor) : false;
     const daysSince = donor ? daysSinceLastDonation(donor) : 0;
+    const verification = donor ? verifyOmang(donors, donor) : null;
+    const returning = donor ? isReturningDonor(donor) : false;
+    const priorDrives = (donor?.drives || []).map(getDriveMeta);
 
     return (
         <div className="max-w-4xl mx-auto animate-fade-in">
@@ -75,8 +84,37 @@ export default function DonorCheckIn() {
                     <UserCheck className="w-6 h-6 text-[#D96070]" />
                     Donor Check-In
                 </h1>
-                <p className="text-sm text-[#8899A8] mt-1">Scan Digital ID or search by Omang to begin the donation process.</p>
+                <p className="text-sm text-[#8899A8] mt-1">Verify the donor's Omang ID to begin — identity is checked and deduplicated against the local register before collection.</p>
             </div>
+
+            {/* Active community-drive banner */}
+            {drive && (
+                <div className="card p-4 mb-6 flex flex-wrap items-center justify-between gap-3"
+                    style={{ background: 'rgba(0,255,136,0.05)', borderColor: 'rgba(0,255,136,0.25)' }}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center"
+                            style={{ background: 'rgba(0,255,136,0.12)' }}>
+                            <Users className="w-4 h-4 text-[#00FF88]" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold text-[#F0F4F8]">{drive.name}</p>
+                            <p className="text-xs text-[#4A5568]">
+                                {drive.organiser} · {new Date(drive.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {drive.location}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-right">
+                        <div>
+                            <p className="font-mono text-lg font-bold text-[#00FF88] leading-none">{drive.registered}<span className="text-xs text-[#4A5568]">/{drive.target}</span></p>
+                            <p className="text-[10px] uppercase tracking-wider text-[#4A5568]">Registered</p>
+                        </div>
+                        <div>
+                            <p className="font-mono text-lg font-bold text-[#F0F4F8] leading-none">{Math.round(drive.returningShare * 100)}%</p>
+                            <p className="text-[10px] uppercase tracking-wider text-[#4A5568]">Returning</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Search & Scan Area */}
             <div className={`card p-6 mb-6 transition-all duration-300 ${scanFlash === 'green' ? 'flash-green' : scanFlash === 'red' ? 'flash-red' : ''
@@ -167,6 +205,82 @@ export default function DonorCheckIn() {
 
                     {/* Card Body */}
                     <div className="p-6">
+                        {/* Omang identity verification + local deduplication */}
+                        {verification && (
+                            <div className="mb-6 rounded-xl border p-4"
+                                style={verification.status === 'DUPLICATE_BLOCKED'
+                                    ? { background: 'rgba(255,45,85,0.06)', borderColor: 'rgba(255,45,85,0.3)' }
+                                    : { background: 'rgba(58,130,184,0.06)', borderColor: 'rgba(58,130,184,0.25)' }}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Fingerprint className="w-4 h-4 text-[#5BA4D4]" />
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-[#5BA4D4]">Identity verification</p>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {/* Omang + dedup */}
+                                    <div className="flex items-start gap-2">
+                                        {verification.status === 'DUPLICATE_BLOCKED'
+                                            ? <ShieldAlert className="w-4 h-4 text-[#FF2D55] mt-0.5 flex-shrink-0" />
+                                            : <ShieldCheck className="w-4 h-4 text-[#00FF88] mt-0.5 flex-shrink-0" />}
+                                        <div>
+                                            <p className="text-xs font-semibold text-[#F0F4F8]">
+                                                Omang {verification.validFormat ? 'verified' : 'format invalid'}
+                                            </p>
+                                            <p className="text-[11px] text-[#8899A8] font-mono">{donor.omang}</p>
+                                            <p className="text-[11px] mt-0.5"
+                                                style={{ color: verification.status === 'DUPLICATE_BLOCKED' ? '#FF2D55' : '#00FF88' }}>
+                                                {verification.status === 'DUPLICATE_BLOCKED'
+                                                    ? `Duplicate blocked — ${verification.matches.length} clashing record(s)`
+                                                    : 'No duplicate in local register'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {/* Azure link */}
+                                    <div className="flex items-start gap-2">
+                                        <Link2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${verification.azureLinked ? 'text-[#00C8FF]' : 'text-[#4A5568]'}`} />
+                                        <div>
+                                            <p className="text-xs font-semibold text-[#F0F4F8]">
+                                                {verification.azureLinked ? 'Azure portal linked' : 'Not on Azure portal'}
+                                            </p>
+                                            <p className="text-[11px] text-[#8899A8]">
+                                                {verification.azureLinked
+                                                    ? `Trust level ${verification.azureTrustLevel} · donor since ${donor.azure?.donorSince ? new Date(donor.azure.donorSince).getFullYear() : '—'}`
+                                                    : 'Offer portal sign-up at exit'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {/* Returning donor */}
+                                    <div className="flex items-start gap-2">
+                                        <History className={`w-4 h-4 mt-0.5 flex-shrink-0 ${returning ? 'text-[#FFB800]' : 'text-[#4A5568]'}`} />
+                                        <div>
+                                            <p className="text-xs font-semibold text-[#F0F4F8]">
+                                                {returning ? 'Returning donor' : 'First-time donor'}
+                                            </p>
+                                            <p className="text-[11px] text-[#8899A8]">
+                                                {returning
+                                                    ? `${donor.totalDonations} lifetime · ${priorDrives.length} prior drive(s)`
+                                                    : 'Welcome & onboard'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Prior drive history (Scyther ↔ Azure retention story) */}
+                                {priorDrives.length > 0 && (
+                                    <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                                        <p className="text-[10px] uppercase tracking-wider text-[#4A5568] mb-2">Previous BLB drives</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {priorDrives.map((d) => (
+                                                <span key={d.id} className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px]"
+                                                    style={{ background: 'rgba(255,184,0,0.08)', color: '#FFB800', border: '1px solid rgba(255,184,0,0.2)' }}>
+                                                    {d.name}{d.date ? ` · ${new Date(d.date).toLocaleDateString('en-GB', { month: 'short', year: '2-digit' })}` : ''}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                             <div className="bg-[#111422] rounded-lg p-3">
                                 <p className="text-[10px] uppercase tracking-wider text-[#4A5568] font-semibold mb-1">Blood Type</p>

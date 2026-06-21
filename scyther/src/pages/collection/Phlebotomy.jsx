@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { createBloodAsset } from '../../lib/api';
 import { formatIsbt128 } from '../../lib/isbt128';
+import { verifyOmang, isReturningDonor } from '../../data/seedCommunityDrive.js';
 import {
     Syringe,
     Play,
@@ -14,11 +15,17 @@ import {
     Package,
     Droplets,
     Camera,
+    Fingerprint,
+    ShieldCheck,
+    ShieldAlert,
+    History,
 } from 'lucide-react';
 
 export default function Phlebotomy() {
-    const { activeDonor, activeScreening, addBloodUnit, addNotification } = useApp();
+    const { donors, activeDonor, activeScreening, addBloodUnit, addNotification } = useApp();
     const navigate = useNavigate();
+    const verification = activeDonor ? verifyOmang(donors, activeDonor) : null;
+    const returning = activeDonor ? isReturningDonor(activeDonor) : false;
     const [bleedStarted, setBleedStarted] = useState(false);
     const [bleedFinished, setBleedFinished] = useState(false);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -160,7 +167,7 @@ export default function Phlebotomy() {
             </div>
 
             {/* Donor + Unit Info */}
-            <div className="card p-4 mb-6 flex items-center justify-between bg-[#111422]">
+            <div className="card p-4 mb-4 flex items-center justify-between bg-[#111422]">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-brand-red-100 flex items-center justify-center">
                         <Droplets className="w-4 h-4 text-[#D96070]" />
@@ -172,6 +179,35 @@ export default function Phlebotomy() {
                 </div>
                 <div className="px-3 py-1 rounded-full bg-[rgba(0,255,136,0.15)] text-[#00FF88] text-xs font-bold">SCREENED</div>
             </div>
+
+            {/* Identity re-verification before the bleed */}
+            {verification && (
+                <div className="card p-3 mb-6 flex flex-wrap items-center gap-x-5 gap-y-2"
+                    style={verification.status === 'DUPLICATE_BLOCKED'
+                        ? { borderColor: 'rgba(255,45,85,0.3)' }
+                        : { borderColor: 'rgba(58,130,184,0.25)' }}>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#5BA4D4]">
+                        <Fingerprint className="w-3.5 h-3.5" /> Identity re-check
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-[#8899A8]">
+                        {verification.status === 'DUPLICATE_BLOCKED'
+                            ? <ShieldAlert className="w-3.5 h-3.5 text-[#FF2D55]" />
+                            : <ShieldCheck className="w-3.5 h-3.5 text-[#00FF88]" />}
+                        Omang <span className="font-mono text-[#F0F4F8]">{activeDonor.omang || '—'}</span>
+                        {verification.status !== 'DUPLICATE_BLOCKED' && <span className="text-[#00FF88]">· no duplicate</span>}
+                    </span>
+                    {verification.azureLinked && (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-[#00C8FF]">
+                            Azure linked · L{verification.azureTrustLevel}
+                        </span>
+                    )}
+                    {returning && (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-[#FFB800]">
+                            <History className="w-3.5 h-3.5" /> Returning · {activeDonor.totalDonations} lifetime
+                        </span>
+                    )}
+                </div>
+            )}
 
             {/* Step 1: Start Bleed */}
             <div className="card p-6 mb-4">

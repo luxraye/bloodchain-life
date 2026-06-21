@@ -5,6 +5,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { getUsers, getAssets } from '../lib/api.js';
 import apiClient from '../lib/apiClient';
+import { COMMUNITY_DRIVE, DRIVE_DONORS } from '../data/seedCommunityDrive.js';
 
 const AppContext = createContext(null);
 
@@ -30,6 +31,7 @@ function mapUserToDonor(user) {
 export function AppProvider({ children }) {
   const [donors,          setDonors]          = useState([]);
   const [donorsLoading,   setDonorsLoading]   = useState(true);
+  const [drive,           setDrive]           = useState(null);
   const [bloodUnits,      setBloodUnits]      = useState([]);
   const [activeDonor,     setActiveDonor]     = useState(null);
   const [activeScreening, setActiveScreening] = useState(null);
@@ -60,8 +62,24 @@ export function AppProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
     getUsers()
-      .then(res => { if (!cancelled && res?.data) setDonors((res.data || []).map(mapUserToDonor)); })
-      .catch(() => { if (!cancelled) setDonors([]); })
+      .then(res => {
+        if (cancelled) return;
+        const mapped = (res?.data || []).map(mapUserToDonor);
+        if (mapped.length) {
+          setDonors(mapped);
+          setDrive(null);
+        } else {
+          // Core unreachable / no provisioned donors → run the BLB community-drive demo
+          setDonors(DRIVE_DONORS);
+          setDrive(COMMUNITY_DRIVE);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDonors(DRIVE_DONORS);
+          setDrive(COMMUNITY_DRIVE);
+        }
+      })
       .finally(() => { if (!cancelled) setDonorsLoading(false); });
     return () => { cancelled = true; };
   }, []);
@@ -95,7 +113,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      donors, donorsLoading,
+      donors, donorsLoading, drive,
       bloodUnits, setBloodUnits, addBloodUnit,
       activeDonor, setActiveDonor,
       activeScreening, setActiveScreening,
