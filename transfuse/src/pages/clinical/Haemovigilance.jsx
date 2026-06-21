@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { ShieldAlert, Plus, AlertTriangle } from 'lucide-react'
+import { ShieldAlert, Plus, AlertTriangle, FileText, Zap } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { buildSadcasIncidentReport } from '../../lib/sadcasReport.js'
+import { downloadFile } from '../../lib/download.js'
 
 const EVENT_TYPES = [
   'Febrile non-haemolytic reaction',
@@ -11,6 +13,16 @@ const EVENT_TYPES = [
   'Bacterial contamination suspected',
   'Other — specify in narrative',
 ]
+
+// One-tap demo scenario for the GPH walkthrough.
+const SIMULATED_REACTION = {
+  patientRef: 'PAT-2026-002',
+  unitId: 'TF-2026-0034',
+  eventType: 'Acute haemolytic transfusion reaction',
+  severity: 'SEVERE',
+  narrative:
+    'Patient developed fever, rigors, loin pain and dark urine ~15 minutes into transfusion of unit TF-2026-0034. Transfusion stopped immediately, saline commenced, vitals monitored. Suspected ABO incompatibility — clerical check and post-reaction samples sent to blood bank.',
+}
 
 const SEVERITY_STYLE = {
   MILD: { color: '#FFB800', bg: 'rgba(255,184,0,0.1)' },
@@ -46,6 +58,18 @@ export default function Haemovigilance() {
     setShowForm(false)
   }
 
+  const handleSimulate = () => {
+    setForm(SIMULATED_REACTION)
+    setShowForm(true)
+    addNotification('Loaded a simulated acute haemolytic reaction — review and submit', 'info')
+  }
+
+  const handleGenerateReport = (event) => {
+    const report = buildSadcasIncidentReport(event)
+    downloadFile(report.filename, report.html)
+    addNotification(`SADCAS incident report generated: ${report.incidentId}`, 'success')
+  }
+
   const openCount = adverseEvents.filter(a => a.status !== 'CLOSED').length
 
   return (
@@ -69,6 +93,9 @@ export default function Haemovigilance() {
               <AlertTriangle className="w-3 h-3" />{openCount} open
             </span>
           )}
+          <button type="button" onClick={handleSimulate} className="btn-secondary flex items-center gap-2 text-sm">
+            <Zap className="w-4 h-4" /> Simulate reaction
+          </button>
           <button type="button" onClick={() => setShowForm(v => !v)} className="btn-primary flex items-center gap-2 text-sm">
             {showForm ? 'Cancel' : <><Plus className="w-4 h-4" /> Report event</>}
           </button>
@@ -136,7 +163,7 @@ export default function Haemovigilance() {
           <table className="w-full border-collapse">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#0C0F1A' }}>
-                {['ID', 'Patient', 'Unit', 'Event', 'Severity', 'Status', 'Reported'].map(h => (
+                {['ID', 'Patient', 'Unit', 'Event', 'Severity', 'Status', 'Reported', 'SADCAS report'].map(h => (
                   <th key={h} className="text-left px-4 py-2.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: '#4A5568' }}>{h}</th>
                 ))}
               </tr>
@@ -161,11 +188,21 @@ export default function Haemovigilance() {
                   <td className="px-4 py-3 text-xs" style={{ color: '#8899A8' }}>
                     {new Date(ev.reportedAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateReport(ev)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                      style={{ background: 'rgba(168,31,56,0.12)', border: '1px solid rgba(168,31,56,0.3)', color: '#D96070' }}
+                    >
+                      <FileText className="w-3 h-3" /> Generate
+                    </button>
+                  </td>
                 </tr>
               ))}
               {adverseEvents.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm" style={{ color: '#4A5568' }}>
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm" style={{ color: '#4A5568' }}>
                     No adverse events recorded this session.
                   </td>
                 </tr>

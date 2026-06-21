@@ -1,7 +1,20 @@
 import { useState, useMemo } from 'react'
 import { useApp } from '../../context/AppContext'
 import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, flexRender } from '@tanstack/react-table'
-import { GitPullRequest, CheckCircle2, XCircle, AlertTriangle, Send, Filter, ArrowUpDown, Plus, X } from 'lucide-react'
+import { GitPullRequest, CheckCircle2, XCircle, AlertTriangle, Send, Filter, ArrowUpDown, Plus, X, Gavel, ClipboardCheck } from 'lucide-react'
+
+const HTC_KIND_LABEL = {
+  ADVERSE_EVENT: 'Adverse event',
+  APPROPRIATENESS: 'Appropriateness',
+  MASSIVE_TRANSFUSION: 'Massive transfusion',
+  NEAR_MISS: 'Near miss',
+  WASTAGE: 'Wastage',
+}
+const HTC_PRIORITY_STYLE = {
+  HIGH: { bg: 'rgba(255,45,85,0.12)', color: '#FF2D55', border: 'rgba(255,45,85,0.3)' },
+  MEDIUM: { bg: 'rgba(255,184,0,0.1)', color: '#FFB800', border: 'rgba(255,184,0,0.3)' },
+  LOW: { bg: 'rgba(255,255,255,0.05)', color: '#8899A8', border: 'rgba(255,255,255,0.1)' },
+}
 
 const URGENCY_STYLE = {
   CRITICAL: { bg: 'rgba(255,45,85,0.12)',  color: '#FF2D55',  border: 'rgba(255,45,85,0.3)'  },
@@ -25,7 +38,7 @@ function Chip({ style, children }) {
 }
 
 export default function RequestManagement() {
-  const { requests, updateRequest, addRequest, addNotification } = useApp()
+  const { requests, updateRequest, addRequest, htcReviews, updateHtcReview, addNotification } = useApp()
   const [sorting,        setSorting]        = useState([])
   const [globalFilter,   setGlobalFilter]   = useState('')
   const [showNew,        setShowNew]        = useState(false)
@@ -115,6 +128,60 @@ export default function RequestManagement() {
           </button>
         </div>
       </div>
+
+      {/* Hospital Transfusion Committee — review queue */}
+      {htcReviews?.length > 0 && (
+        <div className="card mb-6 overflow-hidden" style={{ borderColor: 'rgba(168,31,56,0.3)' }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#111422' }}>
+            <div className="flex items-center gap-2">
+              <Gavel className="w-4 h-4" style={{ color: '#D96070' }} />
+              <p className="text-sm font-bold" style={{ color: '#F0F4F8' }}>Hospital Transfusion Committee</p>
+              <span className="text-xs" style={{ color: '#4A5568' }}>· Review queue</span>
+            </div>
+            <span className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
+              style={{ background: 'rgba(168,31,56,0.12)', border: '1px solid rgba(168,31,56,0.3)', color: '#D96070' }}>
+              {htcReviews.filter(r => !['REVIEWED', 'CLOSED'].includes(r.status)).length} pending review
+            </span>
+          </div>
+          <div className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+            {htcReviews.map(r => {
+              const reviewed = ['REVIEWED', 'CLOSED'].includes(r.status)
+              const ps = HTC_PRIORITY_STYLE[r.priority] || HTC_PRIORITY_STYLE.MEDIUM
+              return (
+                <div key={r.id} className="px-5 py-3 flex items-start justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="font-mono text-[11px]" style={{ color: '#5BA4D4' }}>{r.id}</span>
+                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: ps.bg, color: ps.color, border: `1px solid ${ps.border}` }}>{r.priority}</span>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: '#8899A8' }}>{HTC_KIND_LABEL[r.kind] || r.kind}</span>
+                      {reviewed && <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'rgba(0,255,136,0.1)', color: '#00FF88' }}>REVIEWED</span>}
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: '#F0F4F8' }}>{r.title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#8899A8' }}>{r.summary}</p>
+                    <p className="text-[11px] mt-1" style={{ color: '#4A5568' }}>
+                      {r.patientRef || '—'}{r.unitId ? ` · unit ${r.unitId}` : ''} · raised by {r.raisedBy} · {new Date(r.raisedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                    </p>
+                  </div>
+                  {!reviewed && (
+                    <div className="flex flex-col gap-1.5 shrink-0">
+                      {r.status !== 'IN_REVIEW' && (
+                        <button onClick={() => { updateHtcReview(r.id, { status: 'IN_REVIEW' }); addNotification(`${r.id} moved to in-review`, 'info') }}
+                          className="text-xs py-1.5 px-2.5 rounded-lg font-semibold" style={{ background: 'rgba(255,184,0,0.1)', border: '1px solid rgba(255,184,0,0.25)', color: '#FFB800' }}>
+                          Start review
+                        </button>
+                      )}
+                      <button onClick={() => { updateHtcReview(r.id, { status: 'REVIEWED' }); addNotification(`${r.id} marked reviewed by committee`, 'success') }}
+                        className="inline-flex items-center gap-1 text-xs py-1.5 px-2.5 rounded-lg font-semibold" style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.25)', color: '#00FF88' }}>
+                        <ClipboardCheck className="w-3 h-3" /> Mark reviewed
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* New order form */}
       {showNew && (

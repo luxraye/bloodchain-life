@@ -33,6 +33,63 @@ const DEMO_ADVERSE = [
   },
 ]
 
+// Hospital Transfusion Committee — standing review queue (the active HTC the
+// WHO assessment found missing at Botswana hospitals).
+const DEMO_HTC_REVIEWS = [
+  {
+    id: 'HTC-2026-021',
+    kind: 'ADVERSE_EVENT',
+    title: 'Acute haemolytic reaction — ABO incompatibility',
+    patientRef: 'PAT-2026-002',
+    unitId: 'TF-2026-0034',
+    severity: 'SEVERE',
+    priority: 'HIGH',
+    summary: 'Suspected clerical mismatch; unit stopped at 15 mL. Root-cause review required.',
+    status: 'PENDING_REVIEW',
+    raisedBy: 'Blood Bank · on duty',
+    raisedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+  },
+  {
+    id: 'HTC-2026-022',
+    kind: 'APPROPRIATENESS',
+    title: 'Single-unit RBC in stable, non-bleeding patient',
+    patientRef: 'PAT-2026-004',
+    unitId: 'TF-2026-0051',
+    severity: 'MODERATE',
+    priority: 'MEDIUM',
+    summary: 'Transfusion at Hb 8.4 g/dL without documented symptoms — appropriateness review.',
+    status: 'PENDING_REVIEW',
+    raisedBy: 'Haematology registrar',
+    raisedAt: new Date(Date.now() - 4 * 86400000).toISOString(),
+  },
+  {
+    id: 'HTC-2026-023',
+    kind: 'MASSIVE_TRANSFUSION',
+    title: 'Massive transfusion protocol activation — theatre',
+    patientRef: 'PAT-2026-001',
+    unitId: null,
+    severity: 'MODERATE',
+    priority: 'MEDIUM',
+    summary: '8 units RBC + 4 FFP in obstetric haemorrhage. MTP audit + ratio review.',
+    status: 'IN_REVIEW',
+    raisedBy: 'Theatre lead',
+    raisedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
+  },
+  {
+    id: 'HTC-2026-024',
+    kind: 'NEAR_MISS',
+    title: 'Wrong-blood-in-tube intercepted at lab',
+    patientRef: 'PAT-2026-005',
+    unitId: null,
+    severity: 'MILD',
+    priority: 'LOW',
+    summary: 'Sample mislabel caught at grouping; no patient harm. Process review.',
+    status: 'PENDING_REVIEW',
+    raisedBy: 'Mars Lab',
+    raisedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
+  },
+]
+
 export function AppProvider({ children }) {
   const [bloodUnits, setBloodUnits] = useState([])
   const [unitsLoading, setUnitsLoading] = useState(true)
@@ -40,6 +97,7 @@ export function AppProvider({ children }) {
   const [transfusions, setTransfusions] = useState([])
   const [standbyDonors, setStandbyDonors] = useState(DEMO_STANDBY)
   const [adverseEvents, setAdverseEvents] = useState(DEMO_ADVERSE)
+  const [htcReviews, setHtcReviews] = useState(DEMO_HTC_REVIEWS)
   const [notifications, setNotifications] = useState([])
 
   const inventory = getInventoryByType(bloodUnits)
@@ -86,6 +144,22 @@ export function AppProvider({ children }) {
     setStandbyDonors(prev => prev.map(d => (d.id === id ? { ...d, ...updates } : d)))
   }, [])
 
+  const addHtcReview = useCallback((review) => {
+    const row = {
+      id: `HTC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 900) + 100)}`,
+      status: 'PENDING_REVIEW',
+      priority: 'HIGH',
+      raisedAt: new Date().toISOString(),
+      ...review,
+    }
+    setHtcReviews(prev => [row, ...prev])
+    return row
+  }, [])
+
+  const updateHtcReview = useCallback((id, updates) => {
+    setHtcReviews(prev => prev.map(r => (r.id === id ? { ...r, ...updates } : r)))
+  }, [])
+
   const reportAdverseEvent = useCallback((payload) => {
     const row = {
       id: `AE-${new Date().getFullYear()}-${String(adverseEvents.length + 1).padStart(4, '0')}`,
@@ -94,8 +168,20 @@ export function AppProvider({ children }) {
       ...payload,
     }
     setAdverseEvents(prev => [row, ...prev])
+    // Route every reported reaction onto the Hospital Transfusion Committee queue.
+    addHtcReview({
+      kind: 'ADVERSE_EVENT',
+      title: payload.eventType || 'Adverse transfusion reaction',
+      patientRef: payload.patientRef,
+      unitId: payload.unitId ?? null,
+      severity: payload.severity || 'MODERATE',
+      priority: ['SEVERE', 'FATAL'].includes(payload.severity) ? 'HIGH' : 'MEDIUM',
+      summary: payload.narrative || 'Adverse reaction reported for committee review.',
+      raisedBy: 'Haemovigilance',
+      linkedEventId: row.id,
+    })
     return row
-  }, [adverseEvents.length])
+  }, [adverseEvents.length, addHtcReview])
 
   const updateAdverseEvent = useCallback((id, updates) => {
     setAdverseEvents(prev => prev.map(e => (e.id === id ? { ...e, ...updates } : e)))
@@ -117,6 +203,9 @@ export function AppProvider({ children }) {
       adverseEvents,
       reportAdverseEvent,
       updateAdverseEvent,
+      htcReviews,
+      addHtcReview,
+      updateHtcReview,
       notifications,
       addNotification,
     }}>

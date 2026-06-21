@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { findDemoPatient } from '../../data/demoPatients.js'
-import { FileHeart, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Activity } from 'lucide-react'
+import { FileHeart, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Activity, ShieldAlert } from 'lucide-react'
 
 const COMPATIBLE = {
   'O-': ['O-','O+','A-','A+','B-','B+','AB-','AB+'],
@@ -34,7 +34,7 @@ function ScanStep({ step, title, sub, children, locked }) {
 }
 
 export default function TransfusionLog() {
-  const { bloodUnits, transfusions, addTransfusion, addNotification } = useApp()
+  const { bloodUnits, transfusions, addTransfusion, reportAdverseEvent, addNotification } = useApp()
   const [patientScan,      setPatientScan]      = useState('')
   const [unitScan,         setUnitScan]         = useState('')
   const [patient,          setPatient]          = useState(null)
@@ -68,6 +68,17 @@ export default function TransfusionLog() {
       setCrossMatchResult(ok ? 'pass' : 'fail')
       addNotification(`Cross-match ${ok ? 'PASS' : 'FAIL'}: ${found.type} → ${patient.bloodType}`, ok ? 'success' : 'error')
     }
+  }
+
+  const handleFlagReaction = (txn) => {
+    reportAdverseEvent({
+      patientRef: txn.patientName,
+      unitId: txn.unitId,
+      eventType: 'Acute haemolytic transfusion reaction',
+      severity: 'MODERATE',
+      narrative: `Reaction flagged from transfusion ${txn.id} (${txn.unitType} → ${txn.patientType}, ${txn.ward}). Transfusion stopped; post-reaction samples and unit returned to blood bank.`,
+    })
+    addNotification(`Reaction flagged for ${txn.patientName} — routed to haemovigilance & HTC queue`, 'warning')
   }
 
   const handleCommit = () => {
@@ -182,7 +193,7 @@ export default function TransfusionLog() {
           <table className="w-full border-collapse">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: '#0C0F1A' }}>
-                {['ID', 'Patient', 'Pt Type', 'Unit', 'Unit Type', 'By', 'Date', 'Ward', 'Status'].map(h => (
+                {['ID', 'Patient', 'Pt Type', 'Unit', 'Unit Type', 'By', 'Date', 'Ward', 'Status', 'Safety'].map(h => (
                   <th key={h} className="text-left px-4 py-2.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: '#4A5568' }}>{h}</th>
                 ))}
               </tr>
@@ -203,10 +214,21 @@ export default function TransfusionLog() {
                   <td className="px-4 py-3">
                     <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'rgba(0,255,136,0.1)', color: '#00FF88' }}>{txn.status}</span>
                   </td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => handleFlagReaction(txn)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                      style={{ background: 'rgba(255,45,85,0.1)', border: '1px solid rgba(255,45,85,0.25)', color: '#FF2D55' }}
+                      title="Flag an adverse reaction for this transfusion"
+                    >
+                      <ShieldAlert className="w-3 h-3" /> Flag reaction
+                    </button>
+                  </td>
                 </tr>
               ))}
               {transfusions.length === 0 && (
-                <tr><td colSpan={9} className="px-4 py-8 text-center text-sm" style={{ color: '#4A5568' }}>No transfusions recorded this session</td></tr>
+                <tr><td colSpan={10} className="px-4 py-8 text-center text-sm" style={{ color: '#4A5568' }}>No transfusions recorded this session</td></tr>
               )}
             </tbody>
           </table>
