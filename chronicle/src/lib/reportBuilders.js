@@ -1,4 +1,4 @@
-import { CONDITION_LABEL, toCsv } from '../data/seedRegistry.js'
+import { CONDITION_LABEL, toCsv, openCareGaps, missedTransfusionPatients } from '../data/seedRegistry.js'
 
 export function buildPatientReport(patients) {
   const rows = patients.map((p) => ({
@@ -49,6 +49,54 @@ export function buildProgressReport(patients) {
     filename: 'chronicle-progress-report.csv',
     csv: toCsv(rows, ['site', 'enrolled', 'reviewsDue', 'openGaps']),
     summary: `Progress report — ${rows.length} sites`,
+  }
+}
+
+export function buildCareGapReport(patients) {
+  const gaps = openCareGaps(patients)
+  const rows = gaps.map((g) => ({
+    registryId: g.registryId,
+    patientName: g.patientName,
+    site: g.site,
+    gapType: g.type,
+    severity: g.severity,
+    summary: g.summary,
+  }))
+  return {
+    filename: 'chronicle-care-gap-report.csv',
+    csv: toCsv(rows, ['registryId', 'patientName', 'site', 'gapType', 'severity', 'summary']),
+    summary: `Care-gap report — ${rows.length} open gaps`,
+  }
+}
+
+/**
+ * Funder-audit export tailored for international funders (e.g. BIPAI / PEPFAR).
+ * Anonymised programme-adherence aggregates — no patient names — suitable for
+ * grant reporting on the Baylor paediatric sickle cell transfusion programme.
+ */
+export function buildFunderAuditReport(patients) {
+  const sickle = patients.filter((p) => p.condition === 'SICKLE_CELL')
+  const paediatric = sickle.filter((p) => p.paediatric)
+  const onProgramme = paediatric.filter((p) => p.transfusionIntervalWeeks)
+  const missed = missedTransfusionPatients(paediatric)
+  const adherence = onProgramme.length
+    ? Math.round(((onProgramme.length - missed.length) / onProgramme.length) * 100)
+    : 0
+  const rows = [
+    { metric: 'Programme', value: 'Baylor Children\u2019s CCE — paediatric sickle cell' },
+    { metric: 'Reporting period end', value: new Date().toISOString().slice(0, 10) },
+    { metric: 'Paediatric sickle cell enrolled', value: paediatric.length },
+    { metric: 'On chronic transfusion programme', value: onProgramme.length },
+    { metric: 'Scheduled-transfusion adherence (%)', value: adherence },
+    { metric: 'Missed transfusions (open)', value: missed.length },
+    { metric: 'Open care gaps (all types)', value: openCareGaps(paediatric).length },
+    { metric: 'De-identified', value: 'YES — no patient identifiers in this export' },
+    { metric: 'Funder format', value: 'BIPAI / PEPFAR programme indicators' },
+  ]
+  return {
+    filename: 'chronicle-funder-audit-BIPAI.csv',
+    csv: toCsv(rows, ['metric', 'value']),
+    summary: `Funder audit (BIPAI) — ${paediatric.length} paediatric patients · ${adherence}% transfusion adherence`,
   }
 }
 

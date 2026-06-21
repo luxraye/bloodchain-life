@@ -169,6 +169,201 @@ export const DEMO_PATIENTS = [
   }),
 ]
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Baylor Children's CCE — paediatric sickle cell cohort (50 profiles)
+//
+// Generated deterministically so the registry, exception queue, and funder
+// exports stay stable across reloads. Adds a transfusion-schedule concept and
+// MISSED_TRANSFUSION care gaps — the core of the Baylor "no child misses a
+// scheduled transfusion" story.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const BAYLOR_SITE = 'Baylor Children\u2019s CCE \u00b7 Sickle Cell Clinic'
+
+const PAED_FIRST_NAMES = [
+  'Tshepo', 'Lesego', 'Karabo', 'Naledi', 'Bonolo', 'Kgomotso', 'Oratile', 'Thato',
+  'Amantle', 'Warona', 'Atang', 'Lebogang', 'Reabetswe', 'Goitseone', 'Bokang', 'Tumelo',
+  'Larona', 'Boago', 'Kgalalelo', 'Pako', 'Tirelo', 'Onalenna', 'Loago', 'Mosa',
+  'Resego', 'Tlotlo', 'Boikanyo', 'Kefilwe', 'Neo', 'Phenyo', 'Tshiamo', 'Uyapo',
+  'Wame', 'Aobakwe', 'Dineo', 'Emang', 'Gaone', 'Itumeleng', 'Kabo', 'Lorato',
+  'Mompati', 'Nkagiso', 'Oarabile', 'Sethunya', 'Tefo', 'Wapula', 'Yarona', 'Boitshepo',
+  'Maatla', 'Refentse',
+]
+
+const PAED_LAST_INITIALS = [
+  'Mokwena', 'Seretse', 'Phiri', 'Tau', 'Kgosana', 'Moeng', 'Dube', 'Molefe',
+  'Ramotswa', 'Pule', 'Modise', 'Kebonang', 'Selepeng', 'Letsholo', 'Morwaeng',
+  'Khama', 'Mogapi', 'Sebina', 'Galebotswe', 'Bathobakae',
+]
+
+const PAED_GENOTYPES = ['HbSS', 'HbSS', 'HbSS', 'HbSC', 'HbS\u03b2-thal'] // HbSS-weighted
+const PAED_BLOOD = ['O+', 'A+', 'B+', 'O-', 'A+', 'O+', 'AB+', 'B-', 'A-', 'O+']
+const REFERRAL_SITES = ['Princess Marina \u00b7 referral', 'Nyangabgwe \u00b7 referral', 'Molepolole \u00b7 outreach']
+const SDOH_POOL = [
+  ['Transportation barrier (Z59.0)'],
+  ['Caregiver employment (Z59.6)'],
+  ['Rural access'],
+  [],
+  [],
+  ['Food insecurity (Z59.4)'],
+]
+
+const DAY_MS = 86400000
+const isoFromNow = (days) => new Date(Date.now() + days * DAY_MS).toISOString()
+const dateFromNow = (days) => isoFromNow(days).slice(0, 10)
+
+/** Build the 50-patient Baylor paediatric sickle cell cohort + matching exceptions. */
+function buildPaediatricSickleCohort() {
+  const patients = []
+  const exceptions = []
+
+  for (let i = 0; i < 50; i++) {
+    const seq = String(i + 1).padStart(3, '0')
+    const id = `bay-${seq}`
+    const registryId = `BAY-2026-${seq}`
+    const first = PAED_FIRST_NAMES[i % PAED_FIRST_NAMES.length]
+    const last = PAED_LAST_INITIALS[(i * 3) % PAED_LAST_INITIALS.length]
+    const name = `${first} ${last[0]}.`
+    const age = 2 + ((i * 7) % 16) // 2–17 yrs (paediatric)
+    const genotype = PAED_GENOTYPES[i % PAED_GENOTYPES.length]
+    const bloodType = PAED_BLOOD[i % PAED_BLOOD.length]
+    const guardian = `${PAED_FIRST_NAMES[(i * 5) % PAED_FIRST_NAMES.length]} ${last}`
+
+    // Chronic transfusion programme: HbSS on a 3–4 week schedule; others hydroxyurea-led.
+    const onTransfusionProgramme = genotype === 'HbSS' && i % 3 !== 0
+    const intervalWeeks = onTransfusionProgramme ? (i % 2 === 0 ? 3 : 4) : null
+    const site = i % 9 === 4 ? REFERRAL_SITES[i % REFERRAL_SITES.length] : BAYLOR_SITE
+
+    // Transfusion timing → drives MISSED_TRANSFUSION gaps.
+    // Every 4th programme patient is overdue (missed), rest are upcoming/on-time.
+    let nextTransfusionDue = null
+    let lastTransfusionAt = null
+    let overdueDays = 0
+    if (onTransfusionProgramme) {
+      const intervalDays = intervalWeeks * 7
+      if (i % 4 === 0) {
+        overdueDays = 7 + (i % 21) // 7–28 days overdue
+        nextTransfusionDue = dateFromNow(-overdueDays)
+        lastTransfusionAt = dateFromNow(-(intervalDays + overdueDays))
+      } else {
+        const dueIn = (i % intervalDays) - 2 // mostly upcoming, a couple due now
+        nextTransfusionDue = dateFromNow(Math.max(dueIn, 1))
+        lastTransfusionAt = dateFromNow(-(intervalDays - Math.max(dueIn, 1)))
+      }
+    }
+
+    const careGaps = []
+    if (overdueDays > 0) {
+      careGaps.push({
+        id: `${id}-gap-tx`,
+        type: 'MISSED_TRANSFUSION',
+        severity: overdueDays > 14 ? 'HIGH' : 'MODERATE',
+        status: 'OPEN',
+        summary: `Scheduled transfusion overdue ${overdueDays} days (q${intervalWeeks}w)`,
+      })
+    }
+    if (i % 7 === 3) {
+      careGaps.push({
+        id: `${id}-gap-visit`,
+        type: 'MISSED_VISIT',
+        severity: 'MODERATE',
+        status: 'OPEN',
+        summary: `No clinic encounter in ${60 + (i % 40)} days`,
+      })
+    }
+    if (i % 11 === 5) {
+      careGaps.push({
+        id: `${id}-gap-risk`,
+        type: 'RISING_RISK',
+        severity: 'HIGH',
+        status: 'OPEN',
+        summary: `${2 + (i % 2)} VOC admissions in 90 days — review`,
+      })
+    }
+    if (i % 13 === 6) {
+      careGaps.push({
+        id: `${id}-gap-tcd`,
+        type: 'TCD_SCREEN_DUE',
+        severity: 'MODERATE',
+        status: 'OPEN',
+        summary: 'Transcranial Doppler stroke screen overdue',
+      })
+    }
+
+    const transfusions = lastTransfusionAt
+      ? [{ date: lastTransfusionAt, product: 'Leucodepleted RBC (paediatric)', units: '1', site: 'Baylor Day Unit' }]
+      : []
+
+    patients.push(mkPatient({
+      id,
+      registryId,
+      name,
+      condition: 'SICKLE_CELL',
+      bloodType,
+      severity: genotype,
+      age,
+      paediatric: true,
+      guardian,
+      site,
+      enrolledAt: dateFromNow(-(120 + i * 11)),
+      nextReview: dateFromNow((i % 30) - 5),
+      nextTransfusionDue,
+      transfusionIntervalWeeks: intervalWeeks,
+      carePlan: {
+        custodian: 'Baylor Children\u2019s CCE',
+        prophylaxis: onTransfusionProgramme
+          ? `Chronic transfusion q${intervalWeeks}w + folate`
+          : 'Hydroxyurea 20 mg/kg + penicillin V + folate',
+        lastFactorLot: null,
+        target: onTransfusionProgramme ? 'HbS <30% pre-transfusion' : 'Reduce VOC frequency',
+        goals: [{ text: 'Zero missed scheduled transfusions', status: 'IN_PROGRESS' }],
+      },
+      transfusions,
+      careGaps,
+      sdohFlags: SDOH_POOL[i % SDOH_POOL.length],
+      notes: `Paediatric ${genotype} · age ${age} · guardian ${guardian}.`,
+      auditLog: [],
+    }))
+
+    // Surface high-priority gaps into the shared exception queue.
+    const txGap = careGaps.find((g) => g.type === 'MISSED_TRANSFUSION')
+    if (txGap) {
+      exceptions.push({
+        id: `ex-${id}-tx`,
+        patientId: id,
+        patientName: name,
+        registryId,
+        type: 'MISSED_TRANSFUSION',
+        severity: txGap.severity,
+        status: 'OPEN',
+        assignee: null,
+        summary: txGap.summary,
+        createdAt: isoFromNow(-(overdueDays)),
+      })
+    }
+    const riskGap = careGaps.find((g) => g.type === 'RISING_RISK')
+    if (riskGap) {
+      exceptions.push({
+        id: `ex-${id}-risk`,
+        patientId: id,
+        patientName: name,
+        registryId,
+        type: 'RISING_RISK',
+        severity: 'HIGH',
+        status: 'OPEN',
+        assignee: null,
+        summary: riskGap.summary,
+        createdAt: isoFromNow(-(i % 20)),
+      })
+    }
+  }
+
+  return { patients, exceptions }
+}
+
+const PAED_SICKLE_COHORT = buildPaediatricSickleCohort()
+DEMO_PATIENTS.push(...PAED_SICKLE_COHORT.patients)
+
 export const DEMO_EXCEPTIONS = [
   { id: 'ex-001', patientId: 'chr-002', patientName: 'R. Dlamini', registryId: 'CHR-2023-0088', type: 'MISSED_VISIT', severity: 'HIGH', status: 'OPEN', assignee: null, summary: 'No PCP encounter in 94 days', createdAt: '2026-05-20T08:00:00Z' },
   { id: 'ex-002', patientId: 'chr-004', patientName: 'L. Kgosana', registryId: 'CHR-2022-0034', type: 'FACTOR_LAPSE', severity: 'HIGH', status: 'OPEN', assignee: 'Demo Coordinator', summary: 'Prophylaxis refill overdue 12 days', createdAt: '2026-05-22T09:00:00Z' },
@@ -176,6 +371,7 @@ export const DEMO_EXCEPTIONS = [
   { id: 'ex-004', patientId: 'chr-007', patientName: 'S. Molefe', registryId: 'CHR-2024-0310', type: 'MISSED_VISIT', severity: 'MODERATE', status: 'IN_PROGRESS', assignee: 'Demo Coordinator', summary: 'No clinic visit in 78 days', createdAt: '2026-05-18T10:00:00Z' },
   { id: 'ex-005', patientId: 'chr-005', patientName: 'K. Moagi', registryId: 'CHR-2025-0012', type: 'UNCONTROLLED_HBA1C', severity: 'MODERATE', status: 'OPEN', assignee: null, summary: 'HbA1c 9.2%', createdAt: '2026-05-26T14:00:00Z' },
   { id: 'ex-006', patientId: 'chr-009', patientName: 'N. Batsumi', registryId: 'CHR-2024-0444', type: 'CHELATION_GAP', severity: 'MODERATE', status: 'CONTACTED', assignee: 'Demo Coordinator', summary: 'Ferritin 1850 µg/L', createdAt: '2026-05-15T08:00:00Z' },
+  ...PAED_SICKLE_COHORT.exceptions,
 ]
 
 export const DEMO_DISCREPANCIES = [
@@ -209,4 +405,42 @@ export function toCsv(rows, columns) {
   const header = columns.join(',')
   const body = rows.map((r) => columns.map((c) => `"${String(r[c] ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
   return `${header}\n${body}`
+}
+
+// ── Care-gap / missed-transfusion helpers (Baylor paediatric sickle cell) ────
+
+export const MISSED_TRANSFUSION = 'MISSED_TRANSFUSION'
+
+export function isTransfusionOverdue(patient) {
+  if (!patient?.nextTransfusionDue) return false
+  return new Date(patient.nextTransfusionDue) < new Date()
+}
+
+/** Patients with an open missed-transfusion care gap. */
+export function missedTransfusionPatients(patients) {
+  return patients.filter((p) =>
+    (p.careGaps || []).some((g) => g.type === 'MISSED_TRANSFUSION' && g.status === 'OPEN'),
+  )
+}
+
+/** Flatten all open care gaps with patient context attached. */
+export function openCareGaps(patients) {
+  return patients.flatMap((p) =>
+    (p.careGaps || [])
+      .filter((g) => g.status === 'OPEN')
+      .map((g) => ({ ...g, patientId: p.id, patientName: p.name, registryId: p.registryId, site: p.site })),
+  )
+}
+
+/** Aggregate counts for the registry / exception dashboards. */
+export function careGapSummary(patients) {
+  const gaps = openCareGaps(patients)
+  const byType = {}
+  gaps.forEach((g) => { byType[g.type] = (byType[g.type] || 0) + 1 })
+  return {
+    total: gaps.length,
+    byType,
+    missedTransfusions: byType.MISSED_TRANSFUSION || 0,
+    highSeverity: gaps.filter((g) => g.severity === 'HIGH').length,
+  }
 }

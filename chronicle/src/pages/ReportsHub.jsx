@@ -6,11 +6,15 @@ import {
   buildExceptionReport,
   buildProgressReport,
   buildPopulationReport,
+  buildCareGapReport,
+  buildFunderAuditReport,
 } from '../lib/reportBuilders.js'
 
 const REPORTS = [
   { id: 'patient', title: 'Patient report', desc: 'Point-of-care roster with care plans and open gaps', build: (p, e) => buildPatientReport(p) },
   { id: 'exception', title: 'Exception report', desc: 'Open outreach items for coordinators', build: (p, e) => buildExceptionReport(e) },
+  { id: 'caregap', title: 'Care gap report', desc: 'All open care gaps incl. missed transfusions', build: (p) => buildCareGapReport(p) },
+  { id: 'funder', title: 'Funder audit · BIPAI', desc: 'De-identified paediatric sickle cell adherence indicators for international funders (BIPAI / PEPFAR)', build: (p) => buildFunderAuditReport(p) },
   { id: 'progress', title: 'Progress report', desc: 'Site-level adherence and review burden', build: (p) => buildProgressReport(p) },
   { id: 'population', title: 'Population report', desc: 'Anonymised aggregates for BPOMAS / MoH (no names)', build: (p) => buildPopulationReport(p) },
 ]
