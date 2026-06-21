@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Droplets, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import BrandLogo from './BrandLogo'
 
 const FEATURES = [
   { icon: '✦', label: 'Donor Check-In',      detail: 'Omang lookup · Azure QR scan · eligibility at a glance' },
@@ -45,7 +46,9 @@ export default function LoginScreen() {
       >
         {/* HD background: style={{ backgroundImage: 'url(/branding/scyther-bg.jpg)', backgroundSize: 'cover' }} */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.12]"
-          style={{ background: 'radial-gradient(ellipse 80% 60% at 25% 25%, #00FF88 0%, transparent 65%)' }} />
+          style={{ background: 'radial-gradient(ellipse 80% 60% at 20% 30%, #A81F38 0%, transparent 65%)' }} />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{ background: 'radial-gradient(ellipse 60% 50% at 80% 70%, #3A82B8 0%, transparent 70%)' }} />
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.5) 1px,transparent 1px)',
@@ -54,21 +57,18 @@ export default function LoginScreen() {
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-12">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(168,31,56,0.15)', border: '1px solid rgba(168,31,56,0.35)' }}>
-              <img src="/branding/logo.png" alt="Bloodchain" className="h-6 w-6 object-contain" />
-            </div>
+            <BrandLogo size={40} />
             <div>
               <p className="text-xs font-bold text-white tracking-wide">Bloodchain</p>
               <p className="font-mono text-[9px] uppercase tracking-[0.14em]" style={{ color: '#4A5568' }}>
-                National Blood Management Platform
+                Modular blood-supply infrastructure
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5 mb-3">
-            <Droplets className="h-5 w-5" style={{ color: '#00FF88' }} />
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: '#00FF88' }}>
+            <Droplets className="h-5 w-5" style={{ color: '#D96070' }} />
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: '#D96070' }}>
               Scyther
             </span>
           </div>
@@ -83,7 +83,7 @@ export default function LoginScreen() {
             {FEATURES.map((f) => (
               <div key={f.label} className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#00FF88' }}>
+                  style={{ background: 'rgba(168,31,56,0.12)', border: '1px solid rgba(168,31,56,0.25)', color: '#D96070' }}>
                   {f.icon}
                 </span>
                 <div>
@@ -106,11 +106,11 @@ export default function LoginScreen() {
 
         <div className="relative w-full max-w-[360px] py-8">
           <div className="lg:hidden flex flex-col items-center gap-2 mb-8 text-center">
-            <div className="h-12 w-12 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)' }}>
-              <Droplets className="h-6 w-6" style={{ color: '#00FF88' }} />
+            <BrandLogo size={48} />
+            <div>
+              <p className="text-sm font-bold text-white">Scyther</p>
+              <p className="font-mono text-[9px] uppercase tracking-[0.14em]" style={{ color: '#4A5568' }}>Bloodchain · Collection</p>
             </div>
-            <p className="text-sm font-bold text-white">Scyther · Collection</p>
           </div>
 
           {isDemoMode && (
@@ -128,12 +128,15 @@ export default function LoginScreen() {
 
           <div className="rounded-2xl overflow-hidden"
             style={{ background: '#0C0F1A', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}>
-            <div className="h-[2px]" style={{ background: 'linear-gradient(90deg, #064e3b, #00FF88, #064e3b)' }} />
+            <div className="h-[2px]" style={{ background: 'linear-gradient(90deg, #4A1020, #A81F38, #3A82B8)' }} />
             <div className="px-6 pt-5 pb-2">
-              <h2 className="text-sm font-semibold mb-1" style={{ color: '#F0F4F8' }}>
-                {isDemoMode ? 'Continue as demo collector' : 'Sign in to your account'}
-              </h2>
-              <p className="mb-5 font-mono text-[10px]" style={{ color: '#4A5568' }}>
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="h-8 w-0.5 rounded-full" style={{ background: '#A81F38', boxShadow: '0 0 10px rgba(168,31,56,0.5)' }} />
+                <h2 className="text-sm font-semibold" style={{ color: '#F0F4F8' }}>
+                  {isDemoMode ? 'Continue as demo collector' : 'Sign in to your account'}
+                </h2>
+              </div>
+              <p className="ml-3 mb-5 font-mono text-[10px]" style={{ color: '#4A5568' }}>
                 COLLECTION · STAFF · PHLEBOTOMY · ADMIN
               </p>
 
@@ -169,8 +172,7 @@ export default function LoginScreen() {
 
                 {isDemoMode ? (
                   <button type="button" onClick={handleDemoAccess} disabled={loading}
-                    className="btn-primary w-full flex items-center justify-center gap-2 mt-1"
-                    style={{ background: '#15803d', boxShadow: '0 0 20px rgba(0,255,136,0.25)' }}>
+                    className="btn-primary w-full flex items-center justify-center gap-2 mt-1">
                     {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Loading…</> : '→ Enter Collection Console'}
                   </button>
                 ) : (

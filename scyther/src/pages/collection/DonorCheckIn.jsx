@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { findDonorByOmang, canDonate, daysSinceLastDonation } from '../../lib/collectionHelpers.js';
 import { verifyOmang, isReturningDonor, getDriveMeta } from '../../data/seedCommunityDrive.js';
+import CollectionPageHeader from '../../components/CollectionPageHeader.jsx';
 import {
     QrCode,
     Search,
@@ -78,14 +79,12 @@ export default function DonorCheckIn() {
 
     return (
         <div className="max-w-4xl mx-auto animate-fade-in">
-            {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-[#F0F4F8] flex items-center gap-2">
-                    <UserCheck className="w-6 h-6 text-[#D96070]" />
-                    Donor Check-In
-                </h1>
-                <p className="text-sm text-[#8899A8] mt-1">Verify the donor's Omang ID to begin — identity is checked and deduplicated against the local register before collection.</p>
-            </div>
+            <CollectionPageHeader
+                eyebrow="Field collection · Step 1 of 3"
+                title="Donor check-in"
+                subtitle="Verify the donor's Omang ID — identity is checked and deduplicated against the local register before collection."
+                icon={UserCheck}
+            />
 
             {/* Active community-drive banner */}
             {drive && (

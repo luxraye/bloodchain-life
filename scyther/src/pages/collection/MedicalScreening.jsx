@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useApp } from '../../context/AppContext';
 import { generateUnitId } from '../../lib/collectionHelpers.js';
+import CollectionPageHeader from '../../components/CollectionPageHeader.jsx';
 import {
     ClipboardList,
     AlertTriangle,
@@ -121,26 +122,27 @@ export default function MedicalScreening() {
 
     return (
         <div className={`max-w-3xl mx-auto animate-fade-in ${flashType === 'green' ? 'flash-green' : flashType === 'red' ? 'flash-red' : ''}`}>
-            {/* Header */}
-            <div className="mb-6">
-                <div className="flex items-center gap-3 mb-1">
-                    <button onClick={handleBack} className="btn-ghost p-1.5" tabIndex={0}>
-                        <ArrowLeft className="w-4 h-4" />
-                    </button>
-                    <h1 className="text-2xl font-bold text-[#F0F4F8] flex items-center gap-2">
-                        <ClipboardList className="w-6 h-6 text-[#D96070]" />
-                        Medical Screening
-                    </h1>
+            <div className="flex items-start gap-3 mb-2">
+                <button type="button" onClick={handleBack} className="btn-ghost p-1.5 mt-1" tabIndex={0}>
+                    <ArrowLeft className="w-4 h-4" />
+                </button>
+                <div className="flex-1">
+                    <CollectionPageHeader
+                        eyebrow="Field collection · Step 2 of 3"
+                        title="Medical screening"
+                        subtitle="Record vitals and run eligibility checks. All fields are tab-navigable."
+                        icon={ClipboardList}
+                    />
                 </div>
-                <p className="text-sm text-[#8899A8] ml-10">Record vitals and run eligibility checks. All fields are tab-navigable.</p>
             </div>
 
             {/* Donor Info Banner */}
             {activeDonor && (
-                <div className="card p-4 mb-6 flex items-center justify-between bg-[#111422]">
+                <div className="card p-4 mb-6 flex items-center justify-between" style={{ background: 'var(--bc-bg-raised)' }}>
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-brand-red-100 flex items-center justify-center">
-                            <Stethoscope className="w-4 h-4 text-[#D96070]" />
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center"
+                            style={{ background: 'rgba(168,31,56,0.12)', border: '1px solid rgba(168,31,56,0.25)' }}>
+                            <Stethoscope className="w-4 h-4" style={{ color: 'var(--bc-burg-300)' }} />
                         </div>
                         <div>
                             <p className="text-sm font-semibold text-[#F0F4F8]">{activeDonor.firstName} {activeDonor.lastName}</p>

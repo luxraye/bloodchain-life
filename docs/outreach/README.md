@@ -6,6 +6,7 @@ Version-controlled home for the strategy and outreach collateral that previously
 
 | File | Use |
 |------|-----|
+| [`PROTOTYPE-OUTREACH-MEMO.md`](./PROTOTYPE-OUTREACH-MEMO.md) | **Start here for beachhead demos** — access URLs, talking points, playbooks, Gemini deck prompts |
 | [`Bloodchain-DNA.md`](./Bloodchain-DNA.md) | Internal leadership reference — what Bloodchain is, architecture, business, outreach |
 | [`STRATEGY-module-teardown.md`](./STRATEGY-module-teardown.md) | Honest per-module GTM verdicts (the "bible") |
 | [`90-day-plan.md`](./90-day-plan.md) | Foundation → discovery → beachhead → national, with capital/network ask |
